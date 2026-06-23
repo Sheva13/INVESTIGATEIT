@@ -50,6 +50,7 @@ public class UIBookFlip : MonoBehaviour
     private CanvasGroup previewCanvasGroup;
     private GameObject darkBackgroundObj;
     private CanvasGroup darkBgCanvasGroup;
+    private Coroutine previewCoroutine;
 
     private void Start()
     {
@@ -236,24 +237,21 @@ public class UIBookFlip : MonoBehaviour
         }
         else
         {
-            if (bookPreviewPanel != null)
+            ShowPreviewPanel();
+        }
+    }
+
+    private void ShowPreviewPanel()
+    {
+        if (bookPreviewPanel != null)
+        {
+            bookPreviewPanel.SetActive(true);
+            if (previewCoroutine != null) StopCoroutine(previewCoroutine);
+            previewCoroutine = StartCoroutine(AnimatePreviewPanel(true));
+            
+            if (closedBookObject != null)
             {
-                bookPreviewPanel.SetActive(true);
-                if (previewCanvasGroup != null)
-                {
-                    previewCanvasGroup.alpha = 1f;
-                    previewCanvasGroup.interactable = true;
-                    previewCanvasGroup.blocksRaycasts = true;
-                }
-                if (darkBgCanvasGroup != null)
-                {
-                    darkBgCanvasGroup.alpha = 1f;
-                    darkBgCanvasGroup.blocksRaycasts = true;
-                }
-                if (closedBookObject != null)
-                {
-                    closedBookObject.SetActive(false);
-                }
+                closedBookObject.SetActive(false);
             }
         }
     }
@@ -261,7 +259,7 @@ public class UIBookFlip : MonoBehaviour
     public void KeepBookItem()
     {
         isItemKept = true;
-        HidePreviewPanel();
+        HidePreviewPanel(true);
         if (closedBookObject != null)
         {
             closedBookObject.SetActive(true);
@@ -270,36 +268,104 @@ public class UIBookFlip : MonoBehaviour
 
     public void OpenBookFromPreview()
     {
-        HidePreviewPanel();
+        HidePreviewPanel(false);
         FlipBook();
     }
 
     public void ClosePreview()
     {
-        HidePreviewPanel();
+        HidePreviewPanel(true);
         if (closedBookObject != null)
         {
             closedBookObject.SetActive(true);
         }
     }
 
-    private void HidePreviewPanel()
+    private void HidePreviewPanel(bool animate = false)
     {
         if (bookPreviewPanel != null)
         {
+            if (animate)
+            {
+                if (previewCoroutine != null) StopCoroutine(previewCoroutine);
+                previewCoroutine = StartCoroutine(AnimatePreviewPanel(false));
+            }
+            else
+            {
+                if (previewCanvasGroup != null)
+                {
+                    previewCanvasGroup.alpha = 0f;
+                    previewCanvasGroup.interactable = false;
+                    previewCanvasGroup.blocksRaycasts = false;
+                }
+                if (!isBookOpen && darkBgCanvasGroup != null)
+                {
+                    darkBgCanvasGroup.alpha = 0f;
+                    darkBgCanvasGroup.blocksRaycasts = false;
+                }
+                bookPreviewPanel.SetActive(false);
+            }
+        }
+    }
+
+    private IEnumerator AnimatePreviewPanel(bool show)
+    {
+        float startAlpha = show ? 0f : 1f;
+        float endAlpha = show ? 1f : 0f;
+        
+        Vector3 startScale = show ? new Vector3(0.8f, 0.8f, 1f) : Vector3.one;
+        Vector3 endScale = show ? Vector3.one : new Vector3(0.8f, 0.8f, 1f);
+
+        float bgStartAlpha = darkBgCanvasGroup != null ? darkBgCanvasGroup.alpha : (show ? 0f : 1f);
+        float bgEndAlpha = show ? 1f : 0f;
+
+        if (previewCanvasGroup != null)
+        {
+            previewCanvasGroup.interactable = false;
+            previewCanvasGroup.blocksRaycasts = false;
+        }
+
+        float elapsedTime = 0f;
+        while (elapsedTime < flipDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / flipDuration);
+            float easeT = 1f - Mathf.Pow(1f - t, 3f);
+
             if (previewCanvasGroup != null)
             {
-                previewCanvasGroup.alpha = 0f;
-                previewCanvasGroup.interactable = false;
-                previewCanvasGroup.blocksRaycasts = false;
+                previewCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, easeT);
             }
-            if (!isBookOpen && darkBgCanvasGroup != null)
+            bookPreviewPanel.transform.localScale = Vector3.Lerp(startScale, endScale, easeT);
+
+            if (darkBgCanvasGroup != null && !isBookOpen)
             {
-                darkBgCanvasGroup.alpha = 0f;
-                darkBgCanvasGroup.blocksRaycasts = false;
+                darkBgCanvasGroup.alpha = Mathf.Lerp(bgStartAlpha, bgEndAlpha, easeT);
             }
+
+            yield return null;
+        }
+
+        if (previewCanvasGroup != null)
+        {
+            previewCanvasGroup.alpha = endAlpha;
+            previewCanvasGroup.interactable = show;
+            previewCanvasGroup.blocksRaycasts = show;
+        }
+        bookPreviewPanel.transform.localScale = endScale;
+
+        if (darkBgCanvasGroup != null && !isBookOpen)
+        {
+            darkBgCanvasGroup.alpha = bgEndAlpha;
+            darkBgCanvasGroup.blocksRaycasts = show;
+        }
+
+        if (!show)
+        {
             bookPreviewPanel.SetActive(false);
         }
+
+        previewCoroutine = null;
     }
 
     public void FlipBook()
@@ -396,6 +462,9 @@ public class UIBookFlip : MonoBehaviour
         float bgStartAlpha = darkBgCanvasGroup != null ? darkBgCanvasGroup.alpha : (isBookOpen ? 0f : 1f);
         float bgEndAlpha = isBookOpen ? 1f : 0f;
 
+        Vector3 openStartScale = isBookOpen ? new Vector3(0.8f, 0.8f, 1f) : Vector3.one;
+        Vector3 openEndScale = isBookOpen ? Vector3.one : new Vector3(0.8f, 0.8f, 1f);
+
         // Aktifkan objek buku buka jika sedang membuka
         if (isBookOpen && openBookObject != null)
         {
@@ -427,31 +496,41 @@ public class UIBookFlip : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / flipDuration);
+            float easeT = 1f - Mathf.Pow(1f - t, 3f);
 
             // Lerp alpha buku tutup
             if (closedBookCanvasGroup != null)
             {
-                closedBookCanvasGroup.alpha = Mathf.Lerp(closedStartAlpha, closedEndAlpha, t);
+                closedBookCanvasGroup.alpha = Mathf.Lerp(closedStartAlpha, closedEndAlpha, easeT);
             }
             else if (closedSprite != null)
             {
                 Color c = closedSprite.color;
-                c.a = Mathf.Lerp(closedStartAlpha, closedEndAlpha, t);
+                c.a = Mathf.Lerp(closedStartAlpha, closedEndAlpha, easeT);
                 closedSprite.color = c;
             }
 
             // Lerp alpha buku buka
             if (openBookCanvasGroup != null)
             {
-                openBookCanvasGroup.alpha = Mathf.Lerp(openStartAlpha, openEndAlpha, t);
+                openBookCanvasGroup.alpha = Mathf.Lerp(openStartAlpha, openEndAlpha, easeT);
+            }
+            if (openBookObject != null)
+            {
+                openBookObject.transform.localScale = Vector3.Lerp(openStartScale, openEndScale, easeT);
             }
 
             if (darkBgCanvasGroup != null)
             {
-                darkBgCanvasGroup.alpha = Mathf.Lerp(bgStartAlpha, bgEndAlpha, t);
+                darkBgCanvasGroup.alpha = Mathf.Lerp(bgStartAlpha, bgEndAlpha, easeT);
             }
 
             yield return null;
+        }
+
+        if (openBookObject != null)
+        {
+            openBookObject.transform.localScale = openEndScale;
         }
 
         // Terapkan nilai akhir secara presisi

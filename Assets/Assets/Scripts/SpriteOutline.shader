@@ -80,7 +80,7 @@ Shader "Custom/SpriteOutline"
             {
                 fixed4 c = tex2D(_MainTex, IN.texcoord) * IN.color;
                 
-                if (_Outline > 0 && c.a == 0)
+                if (_Outline > 0 && c.a < 0.1)
                 {
                     float3 scale = float3(_MainTex_TexelSize.xy * _OutlineSize, 0);
                     
@@ -89,17 +89,16 @@ Shader "Custom/SpriteOutline"
                     float a_left = tex2D(_MainTex, IN.texcoord - scale.xz).a;
                     float a_right = tex2D(_MainTex, IN.texcoord + scale.xz).a;
                     
-                    if (a_up > 0 || a_down > 0 || a_left > 0 || a_right > 0)
+                    // Gunakan threshold 0.5 untuk mengabaikan noise/bayangan transparan pada tekstur
+                    if (a_up > 0.5 || a_down > 0.5 || a_left > 0.5 || a_right > 0.5)
                     {
                         c = _OutlineColor;
                         c.rgb *= c.a;
+                        return c;
                     }
                 }
-                else
-                {
-                    c.rgb *= c.a;
-                }
                 
+                c.rgb *= c.a;
                 return c;
             }
         ENDCG
