@@ -12,7 +12,7 @@ Shader "Custom/SpriteOutline"
 
         // Outline properties
         _Outline ("Outline", Float) = 0
-        _OutlineColor ("Outline Color", Color) = (1,1,1,1)
+        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
         _OutlineSize ("Outline Size", Range(1, 10)) = 1
     }
 

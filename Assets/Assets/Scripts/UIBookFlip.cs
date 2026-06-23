@@ -48,6 +48,8 @@ public class UIBookFlip : MonoBehaviour
 
     private bool isItemKept = false;
     private CanvasGroup previewCanvasGroup;
+    private GameObject darkBackgroundObj;
+    private CanvasGroup darkBgCanvasGroup;
 
     private void Start()
     {
@@ -126,6 +128,38 @@ public class UIBookFlip : MonoBehaviour
         {
             openBookGroup();
         }
+
+        CreateDarkBackground();
+    }
+
+    private void CreateDarkBackground()
+    {
+        Canvas parentCanvas = null;
+        if (bookPreviewPanel != null)
+            parentCanvas = bookPreviewPanel.GetComponentInParent<Canvas>();
+        else if (openBookObject != null)
+            parentCanvas = openBookObject.GetComponentInParent<Canvas>();
+        
+        if (parentCanvas == null) return;
+
+        darkBackgroundObj = new GameObject("DarkBackgroundOverlay");
+        darkBackgroundObj.transform.SetParent(parentCanvas.transform, false);
+        darkBackgroundObj.transform.SetSiblingIndex(0);
+
+        Image bgImage = darkBackgroundObj.AddComponent<Image>();
+        bgImage.color = new Color(0f, 0f, 0f, 0.85f);
+
+        RectTransform rect = darkBackgroundObj.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.sizeDelta = Vector2.zero;
+
+        darkBgCanvasGroup = darkBackgroundObj.AddComponent<CanvasGroup>();
+        darkBgCanvasGroup.alpha = 0f;
+        darkBgCanvasGroup.blocksRaycasts = false;
+        darkBgCanvasGroup.interactable = false;
+
+        darkBackgroundObj.SetActive(true);
     }
 
     private void openBookGroup()
@@ -184,6 +218,12 @@ public class UIBookFlip : MonoBehaviour
             }
         }
 
+        if (darkBgCanvasGroup != null)
+        {
+            darkBgCanvasGroup.alpha = 0f;
+            darkBgCanvasGroup.blocksRaycasts = false;
+        }
+
         HidePreviewPanel();
         UpdatePageContent();
     }
@@ -204,6 +244,11 @@ public class UIBookFlip : MonoBehaviour
                     previewCanvasGroup.alpha = 1f;
                     previewCanvasGroup.interactable = true;
                     previewCanvasGroup.blocksRaycasts = true;
+                }
+                if (darkBgCanvasGroup != null)
+                {
+                    darkBgCanvasGroup.alpha = 1f;
+                    darkBgCanvasGroup.blocksRaycasts = true;
                 }
                 if (closedBookObject != null)
                 {
@@ -247,6 +292,11 @@ public class UIBookFlip : MonoBehaviour
                 previewCanvasGroup.alpha = 0f;
                 previewCanvasGroup.interactable = false;
                 previewCanvasGroup.blocksRaycasts = false;
+            }
+            if (!isBookOpen && darkBgCanvasGroup != null)
+            {
+                darkBgCanvasGroup.alpha = 0f;
+                darkBgCanvasGroup.blocksRaycasts = false;
             }
             bookPreviewPanel.SetActive(false);
         }
@@ -343,6 +393,9 @@ public class UIBookFlip : MonoBehaviour
         float openStartAlpha = isBookOpen ? 0f : 1f;
         float openEndAlpha = isBookOpen ? 1f : 0f;
 
+        float bgStartAlpha = darkBgCanvasGroup != null ? darkBgCanvasGroup.alpha : (isBookOpen ? 0f : 1f);
+        float bgEndAlpha = isBookOpen ? 1f : 0f;
+
         // Aktifkan objek buku buka jika sedang membuka
         if (isBookOpen && openBookObject != null)
         {
@@ -393,10 +446,21 @@ public class UIBookFlip : MonoBehaviour
                 openBookCanvasGroup.alpha = Mathf.Lerp(openStartAlpha, openEndAlpha, t);
             }
 
+            if (darkBgCanvasGroup != null)
+            {
+                darkBgCanvasGroup.alpha = Mathf.Lerp(bgStartAlpha, bgEndAlpha, t);
+            }
+
             yield return null;
         }
 
         // Terapkan nilai akhir secara presisi
+        if (darkBgCanvasGroup != null)
+        {
+            darkBgCanvasGroup.alpha = bgEndAlpha;
+            darkBgCanvasGroup.blocksRaycasts = isBookOpen;
+        }
+
         if (closedBookObject != null)
         {
             if (closedBookCanvasGroup != null)
