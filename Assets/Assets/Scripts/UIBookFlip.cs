@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 
 public class UIBookFlip : MonoBehaviour
@@ -12,9 +13,9 @@ public class UIBookFlip : MonoBehaviour
 
     [Header("Item Preview References")]
     [SerializeField] private GameObject bookPreviewPanel;
-    [SerializeField] private Button previewKeepButton;
     [SerializeField] private Button previewOpenButton;
     [SerializeField] private Button previewEscButton;
+    [SerializeField] private Button captureButton;
 
     [Header("UI Text References")]
     [SerializeField] private TextMeshProUGUI leftPageText;
@@ -82,9 +83,9 @@ public class UIBookFlip : MonoBehaviour
         }
 
         // Tambahkan listener preview panel
-        if (previewKeepButton != null)
+        if (captureButton != null)
         {
-            previewKeepButton.onClick.AddListener(KeepBookItem);
+            captureButton.onClick.AddListener(OnCaptureButtonClicked);
         }
         if (previewOpenButton != null)
         {
@@ -114,6 +115,15 @@ public class UIBookFlip : MonoBehaviour
             else if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Escape))
             {
                 ClosePreview();
+            }
+        }
+
+        // Keyboard hotkey for CaptureButton when open book is active
+        if (isBookOpen && openBookObject != null && openBookObject.activeInHierarchy)
+        {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                OnCaptureButtonClicked();
             }
         }
     }
@@ -264,6 +274,32 @@ public class UIBookFlip : MonoBehaviour
         {
             closedBookObject.SetActive(true);
         }
+    }
+
+    public void OnCaptureButtonClicked()
+    {
+        if (!isBookOpen || openBookObject == null) return;
+
+        StartCoroutine(CaptureScreenshotCoroutine());
+    }
+
+    private IEnumerator CaptureScreenshotCoroutine()
+    {
+        string folderPath = Application.dataPath + "/Captures";
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        string fileName = $"BookCapture_{timestamp}.png";
+        string fullPath = folderPath + "/" + fileName;
+
+        yield return new WaitForEndOfFrame();
+
+        ScreenCapture.CaptureScreenshot(fullPath);
+
+        Debug.Log($"Book pages captured and saved to: {fullPath}");
     }
 
     public void OpenBookFromPreview()
