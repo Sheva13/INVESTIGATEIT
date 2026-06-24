@@ -323,6 +323,13 @@ public class UIBookFlip : MonoBehaviour
     public void OnCaptureButtonClicked()
     {
         if (!isBookOpen || openBookObject == null) return;
+        
+        if (phoneCameraOverlay == null)
+        {
+            Debug.LogError("Phone Camera Overlay is missing! Please assign it in the Inspector.");
+            return;
+        }
+        
         ShowPhoneOverlay();
     }
 
@@ -388,16 +395,11 @@ public class UIBookFlip : MonoBehaviour
         {
             openBookObject.SetActive(true);
 
-            for (int i = 0; i < openBookObject.transform.childCount; i++)
-            {
-                GameObject child = openBookObject.transform.GetChild(i).gameObject;
-                bool isBookPage = child.name == "LeftText" || child.name == "RightText";
-                if (!isBookPage && child.activeSelf)
-                {
-                    child.SetActive(false);
-                    hiddenObjects.Add(child);
-                }
-            }
+            // Hanya sembunyikan tombol navigasi, bukan seluruh elemen buku
+            if (prevButton != null && prevButton.gameObject.activeSelf) { prevButton.gameObject.SetActive(false); hiddenObjects.Add(prevButton.gameObject); }
+            if (nextButton != null && nextButton.gameObject.activeSelf) { nextButton.gameObject.SetActive(false); hiddenObjects.Add(nextButton.gameObject); }
+            if (closeButton != null && closeButton.gameObject.activeSelf) { closeButton.gameObject.SetActive(false); hiddenObjects.Add(closeButton.gameObject); }
+            if (captureButton != null && captureButton.gameObject.activeSelf) { captureButton.gameObject.SetActive(false); hiddenObjects.Add(captureButton.gameObject); }
 
             CanvasGroup obCg = openBookObject.GetComponent<CanvasGroup>();
             if (obCg != null)
