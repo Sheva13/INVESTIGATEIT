@@ -26,6 +26,11 @@ public class UIBookFlip : MonoBehaviour
     [SerializeField] private Button nextButton;
     [SerializeField] private Button closeButton;
 
+    [Header("Phone Camera Overlay")]
+    [SerializeField] private GameObject phoneCameraOverlay;
+    [SerializeField] private Button phoneCaptureBtn;
+    [SerializeField] private Button phoneCloseBtn;
+
     [Header("Animation Settings")]
     [SerializeField] private float flipDuration = 0.5f;
 
@@ -96,6 +101,16 @@ public class UIBookFlip : MonoBehaviour
             previewEscButton.onClick.AddListener(ClosePreview);
         }
 
+        // Tambahkan listener phone camera
+        if (phoneCaptureBtn != null)
+        {
+            phoneCaptureBtn.onClick.AddListener(OnPhoneCaptureClicked);
+        }
+        if (phoneCloseBtn != null)
+        {
+            phoneCloseBtn.onClick.AddListener(OnPhoneCloseClicked);
+        }
+
         UpdatePageContent();
     }
 
@@ -118,12 +133,36 @@ public class UIBookFlip : MonoBehaviour
             }
         }
 
-        // Keyboard hotkey for CaptureButton when open book is active
-        if (isBookOpen && openBookObject != null && openBookObject.activeInHierarchy)
+        // Keyboard hotkeys for phone camera overlay
+        else if (phoneCameraOverlay != null && phoneCameraOverlay.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                OnPhoneCaptureClicked();
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                OnPhoneCloseClicked();
+            }
+        }
+        // Keyboard hotkeys for open book
+        else if (isBookOpen && openBookObject != null && openBookObject.activeInHierarchy)
         {
             if (Input.GetKeyDown(KeyCode.C))
             {
                 OnCaptureButtonClicked();
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                FlipBook(); // Close the book
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                PreviousPage();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                NextPage();
             }
         }
     }
@@ -235,6 +274,11 @@ public class UIBookFlip : MonoBehaviour
             darkBgCanvasGroup.blocksRaycasts = false;
         }
 
+        if (phoneCameraOverlay != null)
+        {
+            phoneCameraOverlay.SetActive(false);
+        }
+
         HidePreviewPanel();
         UpdatePageContent();
     }
@@ -279,7 +323,46 @@ public class UIBookFlip : MonoBehaviour
     public void OnCaptureButtonClicked()
     {
         if (!isBookOpen || openBookObject == null) return;
+        ShowPhoneOverlay();
+    }
 
+    private void ShowPhoneOverlay()
+    {
+        if (phoneCameraOverlay == null) return;
+
+        phoneCameraOverlay.SetActive(true);
+        phoneCameraOverlay.transform.SetAsLastSibling();
+
+        var cg = phoneCameraOverlay.GetComponent<CanvasGroup>();
+        if (cg != null)
+        {
+            cg.alpha = 1f;
+            cg.interactable = true;
+            cg.blocksRaycasts = true;
+        }
+    }
+
+    private void HidePhoneOverlay()
+    {
+        if (phoneCameraOverlay == null) return;
+
+        var cg = phoneCameraOverlay.GetComponent<CanvasGroup>();
+        if (cg != null)
+        {
+            cg.alpha = 0f;
+            cg.interactable = false;
+            cg.blocksRaycasts = false;
+        }
+        phoneCameraOverlay.SetActive(false);
+
+        if (isBookOpen && openBookObject != null)
+        {
+            openBookObject.SetActive(true);
+        }
+    }
+
+    public void OnPhoneCaptureClicked()
+    {
         StartCoroutine(CaptureScreenshotCoroutine());
     }
 
@@ -295,11 +378,61 @@ public class UIBookFlip : MonoBehaviour
         string fileName = $"BookCapture_{timestamp}.png";
         string fullPath = folderPath + "/" + fileName;
 
+        HidePhoneOverlay();
+
+        yield return new WaitForEndOfFrame();
+
+        List<GameObject> hiddenObjects = new List<GameObject>();
+
+        if (openBookObject != null)
+        {
+            openBookObject.SetActive(true);
+
+            for (int i = 0; i < openBookObject.transform.childCount; i++)
+            {
+                GameObject child = openBookObject.transform.GetChild(i).gameObject;
+                bool isBookPage = child.name == "LeftText" || child.name == "RightText";
+                if (!isBookPage && child.activeSelf)
+                {
+                    child.SetActive(false);
+                    hiddenObjects.Add(child);
+                }
+            }
+
+            CanvasGroup obCg = openBookObject.GetComponent<CanvasGroup>();
+            if (obCg != null)
+            {
+                obCg.alpha = 1f;
+                obCg.blocksRaycasts = false;
+            }
+        }
+
         yield return new WaitForEndOfFrame();
 
         ScreenCapture.CaptureScreenshot(fullPath);
 
+        yield return null;
+
+        foreach (GameObject obj in hiddenObjects)
+        {
+            if (obj != null) obj.SetActive(true);
+        }
+
+        if (openBookObject != null)
+        {
+            CanvasGroup obCg = openBookObject.GetComponent<CanvasGroup>();
+            if (obCg != null)
+            {
+                obCg.blocksRaycasts = true;
+            }
+        }
+
         Debug.Log($"Book pages captured and saved to: {fullPath}");
+    }
+
+    public void OnPhoneCloseClicked()
+    {
+        HidePhoneOverlay();
     }
 
     public void OpenBookFromPreview()

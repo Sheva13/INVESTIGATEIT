@@ -1,15 +1,14 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIBookFlipTrigger : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class UIItemInspectTrigger : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("UI Book Flip Reference")]
-    [SerializeField] private UIBookFlip bookFlip;
+    [Header("Item Inspect Reference")]
+    [SerializeField] private UIItemInspect itemInspect;
 
     private SpriteRenderer spriteRenderer;
     private int lastTriggerFrame = -1;
     private static readonly int OutlineProperty = Shader.PropertyToID("_Outline");
-
     private bool isHovered = false;
 
     private void Start()
@@ -19,18 +18,18 @@ public class UIBookFlipTrigger : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     private void Update()
     {
+        // Keyboard trigger support
         if (isHovered && Input.GetKeyDown(KeyCode.E))
         {
-            TriggerFlip();
+            TriggerInspect();
             SetOutline(false);
-            isHovered = false;
+            isHovered = false; // Reset hover state to avoid multiple triggers if UI blocks raycasts
         }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        TriggerFlip();
-        // Deactivate outline on click to ensure clean transitions
+        TriggerInspect();
         SetOutline(false);
         isHovered = false;
     }
@@ -55,20 +54,20 @@ public class UIBookFlipTrigger : MonoBehaviour, IPointerClickHandler, IPointerEn
         }
     }
 
-    private void TriggerFlip()
+    private void TriggerInspect()
     {
         if (Time.frameCount == lastTriggerFrame)
-            return; // Cegah double trigger dalam frame yang sama
+            return; // Prevent double trigger in same frame
 
         lastTriggerFrame = Time.frameCount;
 
-        if (bookFlip != null)
+        if (itemInspect != null)
         {
-            bookFlip.OnBookTriggered();
+            itemInspect.OnItemTriggered();
         }
         else
         {
-            Debug.LogWarning("UIBookFlip reference is missing on " + gameObject.name, this);
+            Debug.LogWarning("UIItemInspect reference is missing on " + gameObject.name, this);
         }
     }
 }
