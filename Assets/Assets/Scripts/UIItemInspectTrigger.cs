@@ -3,17 +3,20 @@ using UnityEngine.EventSystems;
 
 public class UIItemInspectTrigger : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Item Inspect Reference")]
+    [Header("UI Inspect Reference")]
     [SerializeField] private UIItemInspect itemInspect;
 
-    private SpriteRenderer spriteRenderer;
     private int lastTriggerFrame = -1;
-    private static readonly int OutlineProperty = Shader.PropertyToID("_Outline");
     private bool isHovered = false;
+    private GameObject hoverOutline;
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        var outlineTransform = transform.Find("HoverOutline");
+        if (outlineTransform != null)
+        {
+            hoverOutline = outlineTransform.gameObject;
+        }
     }
 
     private void Update()
@@ -23,7 +26,7 @@ public class UIItemInspectTrigger : MonoBehaviour, IPointerClickHandler, IPointe
         {
             TriggerInspect();
             SetOutline(false);
-            isHovered = false; // Reset hover state to avoid multiple triggers if UI blocks raycasts
+            isHovered = false;
         }
     }
 
@@ -48,16 +51,16 @@ public class UIItemInspectTrigger : MonoBehaviour, IPointerClickHandler, IPointe
 
     private void SetOutline(bool enable)
     {
-        if (spriteRenderer != null && spriteRenderer.sharedMaterial != null)
+        if (hoverOutline != null)
         {
-            spriteRenderer.sharedMaterial.SetFloat(OutlineProperty, enable ? 1f : 0f);
+            hoverOutline.SetActive(enable);
         }
     }
 
     private void TriggerInspect()
     {
         if (Time.frameCount == lastTriggerFrame)
-            return; // Prevent double trigger in same frame
+            return;
 
         lastTriggerFrame = Time.frameCount;
 

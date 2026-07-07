@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using TMPro;
 
 public class UIBookFlip : MonoBehaviour
@@ -25,11 +24,6 @@ public class UIBookFlip : MonoBehaviour
     [SerializeField] private Button prevButton;
     [SerializeField] private Button nextButton;
     [SerializeField] private Button closeButton;
-
-    [Header("Phone Camera Overlay")]
-    [SerializeField] private GameObject phoneCameraOverlay;
-    [SerializeField] private Button phoneCaptureBtn;
-    [SerializeField] private Button phoneCloseBtn;
 
     [Header("Animation Settings")]
     [SerializeField] private float flipDuration = 0.5f;
@@ -101,16 +95,6 @@ public class UIBookFlip : MonoBehaviour
             previewEscButton.onClick.AddListener(ClosePreview);
         }
 
-        // Tambahkan listener phone camera
-        if (phoneCaptureBtn != null)
-        {
-            phoneCaptureBtn.onClick.AddListener(OnPhoneCaptureClicked);
-        }
-        if (phoneCloseBtn != null)
-        {
-            phoneCloseBtn.onClick.AddListener(OnPhoneCloseClicked);
-        }
-
         UpdatePageContent();
     }
 
@@ -133,28 +117,16 @@ public class UIBookFlip : MonoBehaviour
             }
         }
 
-        // Keyboard hotkeys for phone camera overlay
-        else if (phoneCameraOverlay != null && phoneCameraOverlay.activeSelf)
-        {
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                OnPhoneCaptureClicked();
-            }
-            else if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                OnPhoneCloseClicked();
-            }
-        }
         // Keyboard hotkeys for open book
-        else if (isBookOpen && openBookObject != null && openBookObject.activeInHierarchy)
+        if (isBookOpen && openBookObject != null && openBookObject.activeInHierarchy)
         {
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.C) && !CameraManager.Instance.IsActive)
             {
                 OnCaptureButtonClicked();
             }
-            else if (Input.GetKeyDown(KeyCode.Escape))
+            else if (Input.GetKeyDown(KeyCode.Escape) && !CameraManager.Instance.IsActive)
             {
-                FlipBook(); // Close the book
+                FlipBook();
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
@@ -274,11 +246,6 @@ public class UIBookFlip : MonoBehaviour
             darkBgCanvasGroup.blocksRaycasts = false;
         }
 
-        if (phoneCameraOverlay != null)
-        {
-            phoneCameraOverlay.SetActive(false);
-        }
-
         HidePreviewPanel();
         UpdatePageContent();
     }
@@ -323,118 +290,17 @@ public class UIBookFlip : MonoBehaviour
     public void OnCaptureButtonClicked()
     {
         if (!isBookOpen || openBookObject == null) return;
-        
-        if (phoneCameraOverlay == null)
-        {
-            Debug.LogError("Phone Camera Overlay is missing! Please assign it in the Inspector.");
-            return;
-        }
-        
-        ShowPhoneOverlay();
-    }
 
-    private void ShowPhoneOverlay()
-    {
-        if (phoneCameraOverlay == null) return;
-
-        phoneCameraOverlay.SetActive(true);
-        phoneCameraOverlay.transform.SetAsLastSibling();
-
-        var cg = phoneCameraOverlay.GetComponent<CanvasGroup>();
-        if (cg != null)
-        {
-            cg.alpha = 1f;
-            cg.interactable = true;
-            cg.blocksRaycasts = true;
-        }
-    }
-
-    private void HidePhoneOverlay()
-    {
-        if (phoneCameraOverlay == null) return;
-
-        var cg = phoneCameraOverlay.GetComponent<CanvasGroup>();
-        if (cg != null)
-        {
-            cg.alpha = 0f;
-            cg.interactable = false;
-            cg.blocksRaycasts = false;
-        }
-        phoneCameraOverlay.SetActive(false);
-
-        if (isBookOpen && openBookObject != null)
-        {
-            openBookObject.SetActive(true);
-        }
-    }
-
-    public void OnPhoneCaptureClicked()
-    {
-        StartCoroutine(CaptureScreenshotCoroutine());
-    }
-
-    private IEnumerator CaptureScreenshotCoroutine()
-    {
-        string folderPath = Application.dataPath + "/Captures";
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
-
-        string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-        string fileName = $"BookCapture_{timestamp}.png";
-        string fullPath = folderPath + "/" + fileName;
-
-        HidePhoneOverlay();
-
-        yield return new WaitForEndOfFrame();
-
-        List<GameObject> hiddenObjects = new List<GameObject>();
-
-        if (openBookObject != null)
-        {
-            openBookObject.SetActive(true);
-
-            // Hanya sembunyikan tombol navigasi, bukan seluruh elemen buku
-            if (prevButton != null && prevButton.gameObject.activeSelf) { prevButton.gameObject.SetActive(false); hiddenObjects.Add(prevButton.gameObject); }
-            if (nextButton != null && nextButton.gameObject.activeSelf) { nextButton.gameObject.SetActive(false); hiddenObjects.Add(nextButton.gameObject); }
-            if (closeButton != null && closeButton.gameObject.activeSelf) { closeButton.gameObject.SetActive(false); hiddenObjects.Add(closeButton.gameObject); }
-            if (captureButton != null && captureButton.gameObject.activeSelf) { captureButton.gameObject.SetActive(false); hiddenObjects.Add(captureButton.gameObject); }
-
-            CanvasGroup obCg = openBookObject.GetComponent<CanvasGroup>();
-            if (obCg != null)
+        CameraManager.Instance.Capture(
+            onCaptured: (photo) =>
             {
-                obCg.alpha = 1f;
-                obCg.blocksRaycasts = false;
-            }
-        }
-
-        yield return new WaitForEndOfFrame();
-
-        ScreenCapture.CaptureScreenshot(fullPath);
-
-        yield return null;
-
-        foreach (GameObject obj in hiddenObjects)
-        {
-            if (obj != null) obj.SetActive(true);
-        }
-
-        if (openBookObject != null)
-        {
-            CanvasGroup obCg = openBookObject.GetComponent<CanvasGroup>();
-            if (obCg != null)
+                Debug.Log("Photo captured: " + photo.width + "x" + photo.height);
+            },
+            onCancelled: () =>
             {
-                obCg.blocksRaycasts = true;
+                Debug.Log("Photo capture cancelled.");
             }
-        }
-
-        Debug.Log($"Book pages captured and saved to: {fullPath}");
-    }
-
-    public void OnPhoneCloseClicked()
-    {
-        HidePhoneOverlay();
+        );
     }
 
     public void OpenBookFromPreview()
