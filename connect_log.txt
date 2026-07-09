@@ -1,0 +1,22 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.4/staging' branch; Version is '6000.4.9f1 (f7258d6eebbe) revision 16197005'; Using compiler version '194234433'; Build Type 'Release'
+OS: 'Windows 11  (10.0.26200) CoreSingleLanguage' Language: 'en' Physical Memory: 7455 MB
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-ASUS" at "2026-07-07T01:18:33.7169353Z"
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-07-07T01:18:33Z
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.4.9f1\Editor\Unity.exe
+-projectPath
+D:\Documents\Pemograman_Game\INVESTIGATEIT
+-quit
+-batchmode
+-executeMethod
+ConnectPhoneReferences.Connect
+-logFile
+D:\Documents\Pemograman_Game\INVESTIGATEIT\connect_log.txt
+Successfully changed project path to: D:\Documents\Pemograman_Game\INVESTIGATEIT
+D:/Documents/Pemograman_Game/INVESTIGATEIT
+Exiting without the bug reporter. Application will terminate with return code 1

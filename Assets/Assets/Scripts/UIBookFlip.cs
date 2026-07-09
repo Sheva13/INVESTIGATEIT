@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using TMPro;
 
 public class UIBookFlip : MonoBehaviour
@@ -118,12 +117,24 @@ public class UIBookFlip : MonoBehaviour
             }
         }
 
-        // Keyboard hotkey for CaptureButton when open book is active
+        // Keyboard hotkeys for open book
         if (isBookOpen && openBookObject != null && openBookObject.activeInHierarchy)
         {
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.C) && !CameraManager.Instance.IsActive)
             {
                 OnCaptureButtonClicked();
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape) && !CameraManager.Instance.IsActive)
+            {
+                FlipBook();
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                PreviousPage();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                NextPage();
             }
         }
     }
@@ -280,26 +291,16 @@ public class UIBookFlip : MonoBehaviour
     {
         if (!isBookOpen || openBookObject == null) return;
 
-        StartCoroutine(CaptureScreenshotCoroutine());
-    }
-
-    private IEnumerator CaptureScreenshotCoroutine()
-    {
-        string folderPath = Application.dataPath + "/Captures";
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
-
-        string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-        string fileName = $"BookCapture_{timestamp}.png";
-        string fullPath = folderPath + "/" + fileName;
-
-        yield return new WaitForEndOfFrame();
-
-        ScreenCapture.CaptureScreenshot(fullPath);
-
-        Debug.Log($"Book pages captured and saved to: {fullPath}");
+        CameraManager.Instance.Capture(
+            onCaptured: (photo) =>
+            {
+                Debug.Log("Photo captured: " + photo.width + "x" + photo.height);
+            },
+            onCancelled: () =>
+            {
+                Debug.Log("Photo capture cancelled.");
+            }
+        );
     }
 
     public void OpenBookFromPreview()

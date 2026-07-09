@@ -1,27 +1,30 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIBookFlipTrigger : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class UIItemInspectTrigger : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("UI Book Flip Reference")]
-    [SerializeField] private UIBookFlip bookFlip;
+    [Header("UI Inspect Reference")]
+    [SerializeField] private UIItemInspect itemInspect;
 
-    private SpriteRenderer spriteRenderer;
     private int lastTriggerFrame = -1;
-    private static readonly int OutlineProperty = Shader.PropertyToID("_Outline");
-
     private bool isHovered = false;
+    private GameObject hoverOutline;
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        var outlineTransform = transform.Find("HoverOutline");
+        if (outlineTransform != null)
+        {
+            hoverOutline = outlineTransform.gameObject;
+        }
     }
 
     private void Update()
     {
+        // Keyboard trigger support
         if (isHovered && Input.GetKeyDown(KeyCode.E))
         {
-            TriggerFlip();
+            TriggerInspect();
             SetOutline(false);
             isHovered = false;
         }
@@ -29,8 +32,7 @@ public class UIBookFlipTrigger : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        TriggerFlip();
-        // Deactivate outline on click to ensure clean transitions
+        TriggerInspect();
         SetOutline(false);
         isHovered = false;
     }
@@ -49,26 +51,26 @@ public class UIBookFlipTrigger : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     private void SetOutline(bool enable)
     {
-        if (spriteRenderer != null && spriteRenderer.sharedMaterial != null)
+        if (hoverOutline != null)
         {
-            spriteRenderer.sharedMaterial.SetFloat(OutlineProperty, enable ? 1f : 0f);
+            hoverOutline.SetActive(enable);
         }
     }
 
-    private void TriggerFlip()
+    private void TriggerInspect()
     {
         if (Time.frameCount == lastTriggerFrame)
-            return; // Cegah double trigger dalam frame yang sama
+            return;
 
         lastTriggerFrame = Time.frameCount;
 
-        if (bookFlip != null)
+        if (itemInspect != null)
         {
-            bookFlip.OnBookTriggered();
+            itemInspect.OnItemTriggered();
         }
         else
         {
-            Debug.LogWarning("UIBookFlip reference is missing on " + gameObject.name, this);
+            Debug.LogWarning("UIItemInspect reference is missing on " + gameObject.name, this);
         }
     }
 }
