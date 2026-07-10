@@ -119,7 +119,12 @@ public class PhoneCameraController : MonoBehaviour
         string dir = Path.GetDirectoryName(tempPath);
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-        gameObject.SetActive(false);
+        if (phoneCanvasGroup != null)
+        {
+            phoneCanvasGroup.alpha = 0f;
+            phoneCanvasGroup.interactable = false;
+            phoneCanvasGroup.blocksRaycasts = false;
+        }
 
         yield return new WaitForEndOfFrame();
 
@@ -127,29 +132,28 @@ public class PhoneCameraController : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        // Show result
-        gameObject.SetActive(true);
-        transform.SetAsLastSibling();
-
-        if (photoResultPanel != null)
-        {
-            photoResultPanel.SetActive(true);
-            var cg = photoResultPanel.GetComponent<CanvasGroup>();
-            if (cg != null) { cg.alpha = 1f; cg.interactable = true; cg.blocksRaycasts = true; }
-        }
-
-        if (File.Exists(tempPath))
-        {
-            var bytes = File.ReadAllBytes(tempPath);
-            var tex = new Texture2D(2, 2);
-            if (tex.LoadImage(bytes) && capturedImage != null)
-            {
-                capturedImage.texture = tex;
-                capturedImage.color = Color.white;
-            }
-        }
-
         if (phoneCaptureBtn != null) phoneCaptureBtn.interactable = true;
+
+        var tex = LoadTempCapture(tempPath);
+        StartCoroutine(FinalizeCapture(tex));
+    }
+
+    private Texture2D LoadTempCapture(string path)
+    {
+        if (!File.Exists(path)) return null;
+        var bytes = File.ReadAllBytes(path);
+        var tex = new Texture2D(2, 2);
+        tex.LoadImage(bytes);
+        return tex;
+    }
+
+    private IEnumerator FinalizeCapture(Texture2D result)
+    {
+        yield return new WaitForEndOfFrame();
+        if (result != null)
+            onCaptureComplete?.Invoke(result);
+        else
+            onCaptureCancelled?.Invoke();
     }
 
     private void FlashEffect()

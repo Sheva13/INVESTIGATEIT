@@ -294,7 +294,7 @@ public class UIBookFlip : MonoBehaviour
         CameraManager.Instance.Capture(
             onCaptured: (photo) =>
             {
-                Debug.Log("Photo captured: " + photo.width + "x" + photo.height);
+                ObjectiveManager.Instance.RegisterPhoto("book");
             },
             onCancelled: () =>
             {
