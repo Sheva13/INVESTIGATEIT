@@ -250,7 +250,7 @@ public class UIItemInspect : MonoBehaviour
             CameraManager.Instance.Capture(
                 onCaptured: (photo) =>
                 {
-                    Debug.Log("Foto frame: Photo captured successfully");
+                    ObjectiveManager.Instance.RegisterPhoto("frame");
                 },
                 onCancelled: () =>
                 {

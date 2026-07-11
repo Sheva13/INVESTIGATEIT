@@ -1,0 +1,115 @@
+<svg width="800" height="900" viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="900" fill="#2b2b28"/>
+<rect x="40" y="40" width="720" height="780" rx="10" fill="#3a3a36" stroke="#888" stroke-width="2"/>
+
+<rect x="50" y="650" width="700" height="160" fill="#4a4a44" opacity="0.5"/>
+<rect x="50" y="460" width="700" height="180" fill="#3f4a4a" opacity="0.5"/>
+<rect x="50" y="260" width="700" height="190" fill="#4a3f3f" opacity="0.5"/>
+<rect x="50" y="60" width="700" height="190" fill="#4a4438" opacity="0.5"/>
+
+<text x="60" y="675" fill="#ddd" font-size="14" font-family="sans-serif">ZONE 1 - Entrance (tutorial)</text>
+<text x="60" y="480" fill="#ddd" font-size="14" font-family="sans-serif">ZONE 2 - Split kiri/kanan</text>
+<text x="60" y="280" fill="#ddd" font-size="14" font-family="sans-serif">ZONE 3 - Konvergensi / tekanan naik</text>
+<text x="60" y="80" fill="#ddd" font-size="14" font-family="sans-serif">ZONE 4 - Final approach</text>
+
+<rect x="50" y="645" width="330" height="8" fill="#666"/>
+<rect x="470" y="645" width="280" height="8" fill="#666"/>
+<text x="390" y="640" fill="#aaa" font-size="10" text-anchor="middle">gap pagar</text>
+
+<rect x="50" y="455" width="480" height="8" fill="#666"/>
+<rect x="620" y="455" width="130" height="8" fill="#666"/>
+<text x="560" y="450" fill="#aaa" font-size="10" text-anchor="middle">gap crate</text>
+
+<rect x="50" y="255" width="180" height="8" fill="#666"/>
+<rect x="320" y="255" width="430" height="8" fill="#666"/>
+<text x="270" y="250" fill="#aaa" font-size="10" text-anchor="middle">gap fence</text>
+
+<rect x="330" y="80" width="140" height="34" rx="4" fill="#3f7d20" stroke="#a5d66a" stroke-width="2"/>
+<text x="400" y="102" fill="#eaffea" font-size="14" text-anchor="middle" font-family="sans-serif">OBJECTIVE (LOOT)</text>
+
+<circle cx="400" cy="790" r="10" fill="#4caf50"/>
+<text x="400" y="815" fill="#ccc" font-size="13" text-anchor="middle" font-family="sans-serif">START</text>
+
+<defs>
+  <g id="dumpster"><rect width="42" height="26" rx="3" fill="#2e6b4f" stroke="#1e4a37" stroke-width="1.5"/></g>
+  <g id="pallet"><rect width="40" height="24" fill="#a67c4e" stroke="#6e5334" stroke-width="1"/><line x1="0" y1="0" x2="40" y2="24" stroke="#6e5334" stroke-width="1"/><line x1="40" y1="0" x2="0" y2="24" stroke="#6e5334" stroke-width="1"/></g>
+  <g id="barrel"><circle r="11" fill="#555" stroke="#222" stroke-width="1.5"/></g>
+  <g id="tires"><circle cx="0" cy="0" r="8" fill="#1a1a1a" stroke="#444" stroke-width="1.5"/><circle cx="14" cy="0" r="8" fill="#1a1a1a" stroke="#444" stroke-width="1.5"/><circle cx="7" cy="-12" r="8" fill="#1a1a1a" stroke="#444" stroke-width="1.5"/></g>
+  <g id="crate"><rect width="34" height="34" fill="#b8935a" stroke="#7a5c34" stroke-width="1.5"/></g>
+  <g id="cardboard"><rect width="26" height="20" fill="#c9a876" stroke="#8a6f4a" stroke-width="1"/></g>
+  <g id="lightpole"><rect width="4" height="40" fill="#888"/><circle cx="2" cy="0" r="5" fill="#fdf3a0"/></g>
+</defs>
+
+<use href="#crate" x="120" y="700"/>
+<use href="#pallet" x="200" y="710"/>
+<use href="#barrel" x="500" y="720"/>
+<use href="#tires" x="620" y="740"/>
+<use href="#cardboard" x="300" y="760"/>
+<use href="#lightpole" x="670" y="670"/>
+
+<line x1="260" y1="705" x2="540" y2="705" stroke="#ffb347" stroke-width="2" stroke-dasharray="6 5"/>
+<polygon points="260,705 270,700 270,710" fill="#ffb347"/>
+<polygon points="540,705 530,700 530,710" fill="#ffb347"/>
+<circle cx="400" cy="705" r="9" fill="#5f5e5a"/>
+<polygon points="400,705 340,660 460,660" fill="#aaa" opacity="0.25"/>
+<text x="400" y="730" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">G1</text>
+<rect x="330" y="740" width="12" height="12" fill="#f0b429"/>
+<text x="336" y="736" fill="#f0b429" font-size="11" text-anchor="middle">C1</text>
+
+<use href="#dumpster" x="90" y="500"/>
+<use href="#crate" x="150" y="560"/>
+<use href="#barrel" x="110" y="610"/>
+<use href="#pallet" x="200" y="600"/>
+
+<line x1="120" y1="530" x2="120" y2="620" stroke="#5aa9e6" stroke-width="2" stroke-dasharray="6 5"/>
+<polygon points="120,530 115,540 125,540" fill="#5aa9e6"/>
+<polygon points="120,620 115,610 125,610" fill="#5aa9e6"/>
+<circle cx="180" cy="560" r="9" fill="#0c447c"/>
+<polygon points="180,560 240,510 240,610" fill="#5aa9e6" opacity="0.25"/>
+<text x="180" y="585" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">G2</text>
+<rect x="120" y="490" width="12" height="12" fill="#f0b429"/>
+<text x="126" y="486" fill="#f0b429" font-size="11" text-anchor="middle">C2</text>
+
+<use href="#dumpster" x="660" y="500"/>
+<use href="#tires" x="600" y="565"/>
+<use href="#crate" x="680" y="610"/>
+<use href="#cardboard" x="610" y="510"/>
+
+<line x1="660" y1="530" x2="660" y2="620" stroke="#e07840" stroke-width="2" stroke-dasharray="6 5"/>
+<polygon points="660,530 655,540 665,540" fill="#e07840"/>
+<polygon points="660,620 655,610 665,610" fill="#e07840"/>
+<circle cx="600" cy="580" r="9" fill="#993c1d"/>
+<polygon points="600,580 540,520 540,630" fill="#e07840" opacity="0.25"/>
+<text x="600" y="605" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">G3</text>
+<rect x="660" y="490" width="12" height="12" fill="#f0b429"/>
+<text x="666" y="486" fill="#f0b429" font-size="11" text-anchor="middle">C3</text>
+
+<use href="#crate" x="330" y="380"/>
+<use href="#crate" x="380" y="380"/>
+<use href="#barrel" x="250" y="340"/>
+<use href="#barrel" x="270" y="360"/>
+<use href="#pallet" x="480" y="330"/>
+<use href="#tires" x="550" y="380"/>
+<use href="#lightpole" x="200" y="290"/>
+
+<path d="M240 300 L560 300 L560 420 L240 420 Z" fill="none" stroke="#c76bd6" stroke-width="2" stroke-dasharray="7 6"/>
+<circle cx="400" cy="300" r="9" fill="#712b6a"/>
+<polygon points="400,300 340,360 460,360" fill="#c76bd6" opacity="0.25"/>
+<text x="400" y="325" fill="#fff" font-size="12" text-anchor="middle" font-family="sans-serif">G4</text>
+<rect x="440" y="400" width="12" height="12" fill="#f0b429"/>
+<text x="446" y="396" fill="#f0b429" font-size="11" text-anchor="middle">C4</text>
+
+<use href="#dumpster" x="150" y="150"/>
+<use href="#crate" x="580" y="160"/>
+<use href="#pallet" x="230" y="200"/>
+<use href="#cardboard" x="500" y="200"/>
+<use href="#lightpole" x="600" y="90"/>
+
+<rect x="400" y="150" width="12" height="12" fill="#f0b429"/>
+<text x="406" y="146" fill="#f0b429" font-size="11" text-anchor="middle">C5</text>
+
+<path d="M400 780 L400 660 L390 645 L200 600 L150 560 L150 460 L280 420 L400 380 L400 300 L400 260 L400 200 L400 114"
+ fill="none" stroke="#7fd858" stroke-width="2.5" stroke-dasharray="3 4" opacity="0.6"/>
+
+<text x="60" y="850" fill="#999" font-size="12" font-family="sans-serif">Garis oranye/biru/ungu putus-putus = jalur patroli guard. Garis hijau putus-putus = contoh jalur tembus pemain.</text>
+</svg>
