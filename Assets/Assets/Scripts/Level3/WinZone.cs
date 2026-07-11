@@ -6,7 +6,7 @@ public class WinZone : MonoBehaviour
 
     void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
+        gm = FindAnyObjectByType<GameManager>();
     }
 
     void OnTriggerEnter2D(Collider2D other)

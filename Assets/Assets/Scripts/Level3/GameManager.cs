@@ -12,16 +12,24 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public PlayerController player;
 
+    [Header("Gameplay State")]
+    public bool hasLoot = false;
+
     void Awake()
     {
-        if (!player) player = FindObjectOfType<PlayerController>();
+        if (!player) player = FindAnyObjectByType<PlayerController>();
+        hasLoot = false;
     }
 
     void Update()
     {
         if (canCountText && player)
         {
-            canCountText.text = $"[Cans: {player.GetThrowableCount()}]";
+            if (!hasLoot)
+            {
+                canCountText.text = $"[Kaleng: {player.GetThrowableCount()}]";
+                canCountText.color = Color.white;
+            }
         }
     }
 

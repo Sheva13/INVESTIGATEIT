@@ -38,16 +38,14 @@ public class NoiseSource : MonoBehaviour
 
     void Update()
     {
+        if (ringSprite == null) return;
         elapsed += Time.deltaTime;
         float t = elapsed / lifetime;
         float size = Mathf.Lerp(0.1f, noiseRadius * 2f, t);
         transform.localScale = Vector3.one * size;
-        if (ringSprite)
-        {
-            Color c = ringSprite.color;
-            c.a = Mathf.Lerp(0.5f, 0f, t);
-            ringSprite.color = c;
-        }
+        Color c = ringSprite.color;
+        c.a = Mathf.Lerp(0.5f, 0f, t);
+        ringSprite.color = c;
     }
 
     void OnDrawGizmos()
