@@ -62,6 +62,11 @@ public class GuardAI : MonoBehaviour
     private Vector2 facingDir = Vector2.right;
     private LineRenderer visionLineRenderer;
     private int frameCounter = 0;
+    private float stuckThreshold = 0.05f;
+    private float stuckCheckInterval = 1.5f;
+    private Vector2 patrolNoiseOffset = Vector2.zero;
+    private float patrolNoiseTimer = 0f;
+    private bool hasCaught = false;
 
     void Awake()
     {
@@ -72,8 +77,11 @@ public class GuardAI : MonoBehaviour
         if (!audioSource) audioSource = GetComponent<AudioSource>();
         if (audioSource != null)
         {
-            audioSource.spatialBlend = 0f;
+            audioSource.spatialBlend = 1.0f;
             audioSource.volume = 0.6f;
+            audioSource.minDistance = 2f;
+            audioSource.maxDistance = 12f;
+            audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         }
         else Debug.LogWarning($"{gameObject.name}: AudioSource missing!");
 
@@ -120,6 +128,7 @@ public class GuardAI : MonoBehaviour
             transform.position = waypoints[0].position;
         }
         lastPosition = transform.position;
+        hasCaught = false;
 
         // Set up Animator
         anim = GetComponent<Animator>();
@@ -134,16 +143,16 @@ public class GuardAI : MonoBehaviour
 
     void Update()
     {
-        // Universal physical stuck detection (1.0s interval)
+        // Universal physical stuck detection
         stuckCheckTimer += Time.deltaTime;
-        if (stuckCheckTimer >= 1.0f)
+        if (stuckCheckTimer >= stuckCheckInterval)
         {
             bool isTryingToMove = currentState == GuardState.Patrol || 
                                   currentState == GuardState.Return || 
                                   currentState == GuardState.Investigate || 
                                   currentState == GuardState.Alert;
 
-            if (isTryingToMove && Vector2.Distance(transform.position, lastPosition) < 0.15f)
+            if (isTryingToMove && Vector2.Distance(transform.position, lastPosition) < stuckThreshold)
             {
                 if (currentState == GuardState.Patrol)
                 {
@@ -185,7 +194,12 @@ public class GuardAI : MonoBehaviour
         CheckVision();
         UpdateColor();
         UpdateSpriteDirection();
-        if (anim != null) anim.SetFloat("Speed", rb.linearVelocity.magnitude);
+        if (anim != null)
+        {
+            anim.SetFloat("MoveX", facingDir.x);
+            anim.SetFloat("MoveY", facingDir.y);
+            anim.SetFloat("Speed", rb.linearVelocity.magnitude);
+        }
 
         // Footstep audio
         bool isMoving = rb.linearVelocity.sqrMagnitude > 0.01f;
@@ -242,7 +256,7 @@ public class GuardAI : MonoBehaviour
         if (waypoints == null || waypoints.Length == 0) return;
 
         waypointTime += Time.deltaTime;
-        if (waypointTime > 8.0f)
+        if (waypointTime > 12.0f)
         {
             wpIndex = (wpIndex + 1) % waypoints.Length;
             waypointTime = 0f;
@@ -251,7 +265,16 @@ public class GuardAI : MonoBehaviour
 
         Transform target = waypoints[wpIndex];
         Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
-        Vector2 avoidDir = AvoidObstacles(dir);
+
+        patrolNoiseTimer -= Time.deltaTime;
+        if (patrolNoiseTimer <= 0f)
+        {
+            patrolNoiseOffset = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)) * 0.3f;
+            patrolNoiseTimer = Random.Range(0.5f, 1.5f);
+        }
+        Vector2 noisyDir = (dir + patrolNoiseOffset).normalized;
+
+        Vector2 avoidDir = AvoidObstacles(noisyDir);
         rb.linearVelocity = avoidDir * patrolSpeed;
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
             facingDir = rb.linearVelocity.normalized;
@@ -286,8 +309,9 @@ public class GuardAI : MonoBehaviour
         if (rb.linearVelocity.sqrMagnitude > 0.01f)
             facingDir = rb.linearVelocity.normalized;
 
-        if (Vector2.Distance(transform.position, player.position) < catchDistance)
+        if (!hasCaught && Vector2.Distance(transform.position, player.position) < catchDistance)
         {
+            hasCaught = true;
             if (caughtClip != null && audioSource != null)
                 audioSource.PlayOneShot(caughtClip);
             gameManager?.LoseGame();
@@ -338,7 +362,7 @@ public class GuardAI : MonoBehaviour
         if (waypoints == null || waypoints.Length == 0) return;
 
         waypointTime += Time.deltaTime;
-        if (waypointTime > 8.0f)
+        if (waypointTime > 10.0f)
         {
             currentState = GuardState.Patrol;
             waypointTime = 0f;
@@ -389,6 +413,7 @@ public class GuardAI : MonoBehaviour
 
     void UpdateSpriteDirection()
     {
+        if (anim != null && anim.runtimeAnimatorController != null) return;
         if (directionSprites == null || directionSprites.Length < 8 || sprite == null) return;
         if (facingDir.sqrMagnitude < 0.001f) return;
 
@@ -432,27 +457,28 @@ public class GuardAI : MonoBehaviour
         };
     }
 
-    // Projects the desired direction to slide smoothly around obstacles
     Vector2 AvoidObstacles(Vector2 desiredDir)
     {
-        // Start raycast slightly in front of the guard's body (0.4f radius offset)
-        Vector2 origin = (Vector2)transform.position + desiredDir * 0.4f;
-        RaycastHit2D hit = Physics2D.Raycast(origin, desiredDir, 0.8f, obstacleMask);
-        if (hit.collider != null)
+        float[] testAngles = { 0f, -20f, 20f, -50f, 50f, -80f, 80f };
+        float bestDist = 0f;
+        float bestAngle = 0f;
+        Vector2 origin = (Vector2)transform.position;
+
+        foreach (float angle in testAngles)
         {
-            Vector2 hitNormal = hit.normal;
-            Vector2 slideDir = desiredDir - Vector2.Dot(desiredDir, hitNormal) * hitNormal;
-            if (slideDir.sqrMagnitude > 0.01f)
+            Vector2 dir = Quaternion.Euler(0, 0, angle) * desiredDir;
+            RaycastHit2D hit = Physics2D.Raycast(origin, dir, 3f, obstacleMask);
+            float dist = hit.collider != null ? hit.distance : 3f;
+            Debug.DrawRay(origin, dir * dist, hit.collider != null ? Color.red : Color.green);
+            if (dist > bestDist)
             {
-                return slideDir.normalized;
-            }
-            else
-            {
-                // Fallback to perpendicular direction
-                return new Vector2(-hitNormal.y, hitNormal.x).normalized;
+                bestDist = dist;
+                bestAngle = angle;
             }
         }
-        return desiredDir;
+
+        Vector2 result = Quaternion.Euler(0, 0, bestAngle) * desiredDir;
+        return result.normalized;
     }
 
     void PlayFootstep()
@@ -461,7 +487,7 @@ public class GuardAI : MonoBehaviour
         var clip = footstepClips[Random.Range(0, footstepClips.Length)];
         if (clip == null) { Debug.LogWarning($"{gameObject.name} footstep clip is null!"); return; }
         audioSource.pitch = 1f + Random.Range(-0.1f, 0.1f);
-        audioSource.volume = Random.Range(0.7f, 1f);
+        audioSource.volume = Random.Range(0.3f, 0.5f);
         audioSource.PlayOneShot(clip);
     }
 

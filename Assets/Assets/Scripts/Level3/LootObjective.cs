@@ -16,15 +16,8 @@ public class LootObjective : MonoBehaviour
             if (gm != null)
             {
                 gm.hasLoot = true;
-                // Display feedback
-                if (gm.canCountText != null)
-                {
-                    gm.canCountText.text = "AKSES GUDANG DIPEROLEH! SEGERA MASUK!";
-                    gm.canCountText.color = Color.green;
-                }
-                Debug.Log("Kartu Akses diperoleh! Segera masuk ke pintu gudang!");
+                gm.ShowNotification("[ ACCESS CARD OBTAINED ]  PROCEED TO WAREHOUSE", Color.green, 4f);
             }
-            // Deactivate visual representation of Access Card
             gameObject.SetActive(false);
         }
     }

@@ -77,7 +77,11 @@ public class PlayerController : MonoBehaviour
         }
 
         if (animator != null)
+        {
+            animator.SetFloat("MoveX", moveInput.x);
+            animator.SetFloat("MoveY", moveInput.y);
             animator.SetFloat("Speed", moveInput.magnitude);
+        }
 
         if (moveInput.x < 0)
             sprite.flipX = true;

@@ -27,8 +27,9 @@ public class ThrowableObject : MonoBehaviour
     {
         target = targetPos;
         isThrown = true;
+        Debug.Log($"ThrowableObject.Throw: clip={(throwClip != null ? throwClip.name : "NULL")}");
         if (throwClip != null)
-            AudioSource.PlayClipAtPoint(throwClip, transform.position);
+            AudioSource.PlayClipAtPoint(throwClip, Camera.main.transform.position, 0.8f);
     }
 
     void Landed()
