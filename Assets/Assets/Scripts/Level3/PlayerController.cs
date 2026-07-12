@@ -5,6 +5,14 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 4f;
 
+    [Header("Jump")]
+    public float jumpForce = 8f;
+    public int maxJumps = 2;
+    public float fallMultiplier = 2.5f;
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
+    public LayerMask groundLayer;
+
     [Header("Throw")]
     public int maxThrowables = 3;
     public GameObject throwablePrefab;
@@ -22,12 +30,20 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer sprite;
     private Animator animator;
     private float stepTimer = 0f;
+    private bool isJumping = false;
+    private float jumpTimer = 0f;
+    private float jumpDuration = 0.35f;
+    private bool isPlatformer = false;
+    private bool isGrounded = true;
+    private bool wasGrounded = true;
+    private int jumpCount = 0;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        isPlatformer = rb.gravityScale > 0.01f;
         if (!audioSource) audioSource = GetComponent<AudioSource>();
         if (audioSource != null)
         {
@@ -55,10 +71,27 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
+
+        if (isPlatformer)
+        {
+            moveInput.y = 0;
+        }
+        else
+        {
+            moveInput.y = Input.GetAxisRaw("Vertical");
+        }
         moveInput.Normalize();
 
-        bool isMoving = moveInput.sqrMagnitude > 0.01f;
+        float speed = isPlatformer ? Mathf.Abs(moveInput.x) : moveInput.magnitude;
+
+        if (isPlatformer && groundCheck != null)
+        {
+            isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+            if (isGrounded && !wasGrounded) jumpCount = 0;
+            wasGrounded = isGrounded;
+        }
+
+        bool isMoving = speed > 0.01f;
         if (isMoving)
         {
             facingDir = moveInput.normalized;
@@ -77,12 +110,63 @@ public class PlayerController : MonoBehaviour
         }
 
         if (animator != null)
-            animator.SetFloat("Speed", moveInput.magnitude);
+            animator.SetFloat("Speed", speed);
 
         if (moveInput.x < 0)
             sprite.flipX = true;
         else if (moveInput.x > 0)
             sprite.flipX = false;
+
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            if (isPlatformer)
+            {
+                if (jumpCount < maxJumps)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+                    rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+                    jumpCount++;
+                    isJumping = true;
+                    jumpTimer = 0f;
+                    if (animator != null)
+                    {
+                        animator.SetBool("isJumping", false);
+                        animator.SetBool("isJumping", true);
+                    }
+                }
+            }
+            else
+            {
+                if (!isJumping)
+                {
+                    isJumping = true;
+                    jumpTimer = 0f;
+                    if (animator != null)
+                        animator.SetBool("isJumping", true);
+                }
+            }
+        }
+
+        if (isJumping)
+        {
+            jumpTimer += Time.deltaTime;
+
+            if (isPlatformer)
+            {
+                if (isGrounded && jumpTimer > 0.1f)
+                {
+                    isJumping = false;
+                    if (animator != null)
+                        animator.SetBool("isJumping", false);
+                }
+            }
+            else if (jumpTimer >= jumpDuration)
+            {
+                isJumping = false;
+                if (animator != null)
+                    animator.SetBool("isJumping", false);
+            }
+        }
 
         if (Input.GetMouseButtonDown(1))
             TryThrow();
@@ -90,7 +174,16 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
+        if (isPlatformer)
+        {
+            rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
+            if (rb.linearVelocity.y < 0)
+                rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        }
+        else
+        {
+            rb.linearVelocity = moveInput * moveSpeed;
+        }
     }
 
     void PlayFootstep()
