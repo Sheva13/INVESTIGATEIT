@@ -28,11 +28,7 @@ public class GameManager : MonoBehaviour
     {
         if (canCountText && player)
         {
-            if (!hasLoot)
-            {
-                canCountText.text = $"[Kaleng: {player.GetThrowableCount()}]";
-                canCountText.color = Color.white;
-            }
+            canCountText.text = $"Jumlah Kaleng yang dibawa : {player.GetThrowableCount()}";
         }
 
         if (notifTimer > 0f)

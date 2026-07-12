@@ -7,11 +7,13 @@ public class NoiseSource : MonoBehaviour
     public float lifetime = 2f;
     public LayerMask guardMask;
 
-    private SpriteRenderer ringSprite;
+    private LineRenderer lineRenderer;
     private float elapsed = 0f;
+    private const int segmentCount = 40; // High resolution circle segments
 
     void Start()
     {
+        // 1. Alert guards within radius
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, noiseRadius, guardMask);
         foreach (var hit in hits)
         {
@@ -19,33 +21,56 @@ public class NoiseSource : MonoBehaviour
             if (guard) guard.HearNoise(transform.position);
         }
 
-        ringSprite = GetComponent<SpriteRenderer>();
-        if (ringSprite == null)
+        // 2. Setup LineRenderer for the Sonar Wave Ring
+        lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer == null)
         {
-            ringSprite = gameObject.AddComponent<SpriteRenderer>();
-            var tex = new Texture2D(32, 32);
-            Color[] pixels = new Color[32 * 32];
-            for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
-            tex.SetPixels(pixels);
-            tex.Apply();
-            ringSprite.sprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
+            lineRenderer = gameObject.AddComponent<LineRenderer>();
         }
-        ringSprite.color = new Color(1f, 1f, 0f, 0.5f);
-        ringSprite.sortingOrder = 2;
+
+        lineRenderer.useWorldSpace = true;
+        lineRenderer.positionCount = segmentCount + 1; // +1 to close circle
+        lineRenderer.loop = true;
+        lineRenderer.startWidth = 0.06f;
+        lineRenderer.endWidth = 0.06f;
+        
+        // Setup sprite material so it has clean color flat rendering
+        var shader = Shader.Find("Sprites/Default");
+        if (shader != null)
+        {
+            lineRenderer.material = new Material(shader);
+        }
+        
+        lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        lineRenderer.receiveShadows = false;
 
         Destroy(gameObject, lifetime);
     }
 
     void Update()
     {
-        if (ringSprite == null) return;
+        if (lineRenderer == null) return;
+        
         elapsed += Time.deltaTime;
-        float t = elapsed / lifetime;
-        float size = Mathf.Lerp(0.1f, noiseRadius * 2f, t);
-        transform.localScale = Vector3.one * size;
-        Color c = ringSprite.color;
-        c.a = Mathf.Lerp(0.5f, 0f, t);
-        ringSprite.color = c;
+        float t = Mathf.Clamp01(elapsed / lifetime);
+        
+        // Interpolate radius and alpha
+        float currentRadius = Mathf.Lerp(0.1f, noiseRadius, t);
+        float alpha = Mathf.Lerp(0.6f, 0f, t);
+        
+        Color waveColor = new Color(1f, 0.9f, 0.2f, alpha); // Sonar yellow-orange
+        lineRenderer.startColor = waveColor;
+        lineRenderer.endColor = waveColor;
+        
+        // Calculate circle positions
+        for (int i = 0; i <= segmentCount; i++)
+        {
+            float angle = i * (360f / segmentCount) * Mathf.Deg2Rad;
+            Vector3 offset = new Vector3(Mathf.Cos(angle) * currentRadius, Mathf.Sin(angle) * currentRadius, 0f);
+            
+            // Keep Z coordinate at -1.0 so it renders on same plane as gameplay
+            lineRenderer.SetPosition(i, new Vector3(transform.position.x + offset.x, transform.position.y + offset.y, -1.0f));
+        }
     }
 
     void OnDrawGizmos()

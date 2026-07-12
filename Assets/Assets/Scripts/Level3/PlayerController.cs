@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 4f;
+    public float acceleration = 12f;
 
     [Header("Throw")]
     public int maxThrowables = 3;
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0f) return;
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput.Normalize();
@@ -94,7 +96,13 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
+        if (Time.timeScale == 0f)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        Vector2 targetVelocity = moveInput * moveSpeed;
+        rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
     }
 
     void PlayFootstep()
