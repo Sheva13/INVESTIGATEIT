@@ -143,5 +143,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ThrowableObject
   throwSpeed: 6
   lifetimeAfterLand: 3
+  maxThrowHeight: 3
   noiseSourcePrefab: {fileID: 8090158487054658331, guid: 954876d3859dbe540bcfda28b706ddef, type: 3}
   throwClip: {fileID: 8300000, guid: bfc69748ea6711745b735b4697d0d9d1, type: 3}

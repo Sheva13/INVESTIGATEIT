@@ -7,7 +7,7 @@ public class ThrowableObject : MonoBehaviour
     public float lifetimeAfterLand = 3f;
 
     [Header("Arc Settings")]
-    public float maxThrowHeight = 1.8f;
+    public float maxThrowHeight = 3f;
 
     [Header("Noise")]
     public GameObject noiseSourcePrefab;

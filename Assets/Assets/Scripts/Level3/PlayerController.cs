@@ -3,11 +3,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 4f;
+    public float moveSpeed = 2.5f;
     public float acceleration = 12f;
 
     [Header("Throw")]
     public int maxThrowables = 3;
+    public float throwRange = 20f;
     public GameObject throwablePrefab;
     public Transform throwSpawnPoint;
 
@@ -38,19 +39,7 @@ public class PlayerController : MonoBehaviour
         else Debug.LogError("PlayerController: AudioSource not found!");
         if (footstepClips == null || footstepClips.Length == 0)
             Debug.LogWarning("PlayerController: footstepClips not assigned!");
-        currentThrowables = maxThrowables;
-    }
-
-    void Start()
-    {
-        var listener = FindAnyObjectByType<AudioListener>();
-        Debug.Log($"PlayerController: AudioListener={(listener != null ? listener.gameObject.name : "NULL")}, AudioSource={audioSource}, clips={footstepClips?.Length}");
-        if (footstepClips != null && footstepClips.Length > 0 && footstepClips[0] != null)
-        {
-            AudioSource.PlayClipAtPoint(footstepClips[0], transform.position, 0.7f);
-            Debug.Log($"PlayerController: test footstep played (clip={footstepClips[0].name}, len={footstepClips[0].samples})");
-        }
-        else Debug.LogWarning("PlayerController: cannot play test footstep — clips missing");
+        currentThrowables = 0;
     }
 
     void Update()
@@ -74,21 +63,14 @@ public class PlayerController : MonoBehaviour
         else
         {
             stepTimer = 0f;
-            if (sprite != null)
-                facingDir = sprite.flipX ? Vector2.left : Vector2.right;
         }
 
         if (animator != null)
         {
-            animator.SetFloat("MoveX", moveInput.x);
-            animator.SetFloat("MoveY", moveInput.y);
+            animator.SetFloat("MoveX", facingDir.x);
+            animator.SetFloat("MoveY", facingDir.y);
             animator.SetFloat("Speed", moveInput.magnitude);
         }
-
-        if (moveInput.x < 0)
-            sprite.flipX = true;
-        else if (moveInput.x > 0)
-            sprite.flipX = false;
 
         if (Input.GetMouseButtonDown(1))
             TryThrow();
@@ -118,8 +100,13 @@ public class PlayerController : MonoBehaviour
     {
         if (currentThrowables <= 0 || throwablePrefab == null) return;
 
-        Vector3 spawnPos = throwSpawnPoint ? throwSpawnPoint.position : transform.position;
-        Vector3 targetPos = spawnPos + (Vector3)facingDir * 4.0f;
+        Vector3 spawnPos = transform.position + (Vector3)facingDir * 1f;
+        Vector3 dir = facingDir;
+        Vector3 targetPos = spawnPos + (Vector3)dir * throwRange;
+
+        RaycastHit2D hit = Physics2D.Raycast(spawnPos, dir, throwRange);
+        if (hit.collider != null)
+            targetPos = hit.point;
 
         GameObject obj = Instantiate(throwablePrefab, spawnPos, Quaternion.identity);
         obj.GetComponent<ThrowableObject>()?.Throw(targetPos);
