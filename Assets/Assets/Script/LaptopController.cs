@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class LaptopController : MonoBehaviour
 {
+    [Header("Camera Manager")]
+    [SerializeField] private CameraManager cameraManager;
     public GameObject laptopOff;
     public GameObject lockScreen;
     public GameObject desktopScreen;
@@ -26,18 +28,35 @@ public class LaptopController : MonoBehaviour
     }
 
     public void CheckPassword()
-{
-    Debug.Log("ENTER DITEKAN");
+    {
+        Debug.Log("ENTER DITEKAN");
 
-    if(passwordInput.text != correctPassword)
-    {
-        errorText.SetActive(true);
+        if(passwordInput.text != correctPassword)
+        {
+            errorText.SetActive(true);
+        }
+        else
+        {
+            errorText.SetActive(false);
+            lockScreen.SetActive(false);
+            desktopScreen.SetActive(true);
+        }
     }
-    else
+
+    public void CaptureScreen()
     {
-        errorText.SetActive(false);
-        lockScreen.SetActive(false);
-        desktopScreen.SetActive(true);
+        if (cameraManager == null)
+            cameraManager = CameraManager.Instance;
+
+        cameraManager.Capture(
+            onCaptured: (photo) =>
+            {
+                ObjectiveManager.Instance.RegisterPhoto("laptop");
+            },
+            onCancelled: () =>
+            {
+                Debug.Log("Foto desktop laptop dibatalkan");
+            }
+        );
     }
-}
 }

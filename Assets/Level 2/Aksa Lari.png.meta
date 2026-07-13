@@ -1,0 +1,336 @@
+fileFormatVersion: 2
+guid: e0de692531727f54dba1da490ccfef81
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 152253757301454469
+    second: aksa_run_0
+  - first:
+      213: -2911432814833761044
+    second: aksa_run_1
+  - first:
+      213: -4662936797272825008
+    second: aksa_run_2
+  - first:
+      213: 8832660268254192035
+    second: aksa_run_3
+  - first:
+      213: 3490921931987944546
+    second: aksa_run_4
+  - first:
+      213: -8771846886900146630
+    second: aksa_run_5
+  - first:
+      213: 7419645968028800065
+    second: aksa_run_6
+  - first:
+      213: 6863485321077420894
+    second: aksa_run_7
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 439
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: aksa_run_0
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 44
+        width: 231
+        height: 439
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 586fbaf4cf9ec1200800000000000000
+      internalID: 152253757301454469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_run_1
+      rect:
+        serializedVersion: 2
+        x: 537
+        y: 44
+        width: 233
+        height: 439
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce40b64c7438897d0800000000000000
+      internalID: -2911432814833761044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_run_2
+      rect:
+        serializedVersion: 2
+        x: 945
+        y: 44
+        width: 229
+        height: 442
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 053a47c20bbe94fb0800000000000000
+      internalID: -4662936797272825008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_run_3
+      rect:
+        serializedVersion: 2
+        x: 1315
+        y: 44
+        width: 231
+        height: 442
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a16ffe67b9e39a70800000000000000
+      internalID: 8832660268254192035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_run_4
+      rect:
+        serializedVersion: 2
+        x: 1731
+        y: 44
+        width: 231
+        height: 442
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26403ce500f327030800000000000000
+      internalID: 3490921931987944546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      aksa_run_0: 152253757301454469
+      aksa_run_0_0: -5130103031853555477
+      aksa_run_0_1: 8923513088065394327
+      aksa_run_0_10: 364883919941192581
+      aksa_run_0_11: -1263252245566527710
+      aksa_run_0_12: -6833848429446151865
+      aksa_run_0_13: 6502583803623931609
+      aksa_run_0_14: -805904696635885174
+      aksa_run_0_15: 3093813641917291605
+      aksa_run_0_2: 3465692531726258815
+      aksa_run_0_3: 2672165549310558519
+      aksa_run_0_4: 2565314666431071118
+      aksa_run_0_5: -6481450984197982885
+      aksa_run_0_6: -8004941931037353080
+      aksa_run_0_7: -6893322114203775357
+      aksa_run_0_8: 109687903967067818
+      aksa_run_0_9: -3949191527653557339
+      aksa_run_1: -2911432814833761044
+      aksa_run_1_0: 4926701135286146662
+      aksa_run_1_1: 2496277005002331051
+      aksa_run_1_10: -3710740894392297512
+      aksa_run_1_11: -3815390240673845579
+      aksa_run_1_12: 1657317831094290144
+      aksa_run_1_13: 2593374315793692461
+      aksa_run_1_14: 7124373934504270998
+      aksa_run_1_15: -8895370777338028445
+      aksa_run_1_2: -2125099397265829688
+      aksa_run_1_3: -1847721137846764309
+      aksa_run_1_4: 1884384650436192683
+      aksa_run_1_5: -4060661330238910517
+      aksa_run_1_6: 1619862906717536323
+      aksa_run_1_7: -2928080118044391279
+      aksa_run_1_8: 8878618215560236717
+      aksa_run_1_9: 9068741879470667451
+      aksa_run_2: -4662936797272825008
+      aksa_run_2_0: 9039324877477837573
+      aksa_run_2_1: 3220435004546668822
+      aksa_run_2_10: -3212066589427181564
+      aksa_run_2_11: -9102104354171716588
+      aksa_run_2_12: -5702738056845721017
+      aksa_run_2_13: -6805915914193865682
+      aksa_run_2_14: -4763361371076328938
+      aksa_run_2_15: 3622115332060443245
+      aksa_run_2_2: 6688669415832191932
+      aksa_run_2_3: -5774800910286241641
+      aksa_run_2_4: -7639822683400150278
+      aksa_run_2_5: -2654585147876890283
+      aksa_run_2_6: -2662070793195434376
+      aksa_run_2_7: 3385302775955898718
+      aksa_run_2_8: 292917043956132054
+      aksa_run_2_9: 3801504858413910488
+      aksa_run_3: 8832660268254192035
+      aksa_run_3_0: 3435777544360871521
+      aksa_run_3_1: 6053301627405978157
+      aksa_run_3_10: -8560233646294600098
+      aksa_run_3_11: -1882219303660002190
+      aksa_run_3_12: 3513590156638295400
+      aksa_run_3_13: -2853953472351140979
+      aksa_run_3_14: -219007216793848177
+      aksa_run_3_15: 3963044441489032412
+      aksa_run_3_2: 3190205739275709504
+      aksa_run_3_3: -7150817711761153766
+      aksa_run_3_4: 3243170114224589255
+      aksa_run_3_5: 7638462504817425304
+      aksa_run_3_6: -4496987793917702571
+      aksa_run_3_7: 5488652851296979086
+      aksa_run_3_8: -3416020631450527523
+      aksa_run_3_9: -2479111464636030242
+      aksa_run_4: 3490921931987944546
+      aksa_run_5: -8771846886900146630
+      aksa_run_6: 7419645968028800065
+      aksa_run_7: 6863485321077420894
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

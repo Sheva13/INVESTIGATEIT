@@ -1,0 +1,87 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "d75af087-eeba-4cd5-8854-cfe2a341018d",
+        "name": "thug with leather jacket",
+        "prompt": "thug with leather jacket",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-07-10T16:36:57.004205+00:00"
+      },
+      "folder": "thug_with_leather_jacket",
+      "frames": {
+        "rotations": {
+          "south": "thug_with_leather_jacket/rotations/south.png",
+          "south-east": "thug_with_leather_jacket/rotations/south-east.png",
+          "east": "thug_with_leather_jacket/rotations/east.png",
+          "north-east": "thug_with_leather_jacket/rotations/north-east.png",
+          "north": "thug_with_leather_jacket/rotations/north.png",
+          "north-west": "thug_with_leather_jacket/rotations/north-west.png",
+          "west": "thug_with_leather_jacket/rotations/west.png",
+          "south-west": "thug_with_leather_jacket/rotations/south-west.png"
+        },
+        "animations": {
+          "Walking": {
+            "north-east": [
+              "thug_with_leather_jacket/animations/Walking/north-east/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/north-east/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/north-east/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/north-east/frame_003.png"
+            ],
+            "south-east": [
+              "thug_with_leather_jacket/animations/Walking/south-east/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/south-east/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/south-east/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/south-east/frame_003.png"
+            ],
+            "south-west": [
+              "thug_with_leather_jacket/animations/Walking/south-west/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/south-west/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/south-west/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/south-west/frame_003.png"
+            ],
+            "north": [
+              "thug_with_leather_jacket/animations/Walking/north/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/north/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/north/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/north/frame_003.png"
+            ],
+            "west": [
+              "thug_with_leather_jacket/animations/Walking/west/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/west/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/west/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/west/frame_003.png"
+            ],
+            "north-west": [
+              "thug_with_leather_jacket/animations/Walking/north-west/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/north-west/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/north-west/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/north-west/frame_003.png"
+            ],
+            "south": [
+              "thug_with_leather_jacket/animations/Walking/south/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/south/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/south/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/south/frame_003.png"
+            ],
+            "east": [
+              "thug_with_leather_jacket/animations/Walking/east/frame_000.png",
+              "thug_with_leather_jacket/animations/Walking/east/frame_001.png",
+              "thug_with_leather_jacket/animations/Walking/east/frame_002.png",
+              "thug_with_leather_jacket/animations/Walking/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-07-10T16:44:41.590852"
+}
