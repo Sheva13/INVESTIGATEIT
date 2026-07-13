@@ -7,6 +7,10 @@ public class LaptopHover : MonoBehaviour
     [SerializeField] private GameObject laptopPanel;   // Drag GameObject 'Panel' ke sini
     [SerializeField] private GameObject laptopOutline; // Drag 'LaptopOutline' ke sini
 
+    [Header("World Object References")]
+    [SerializeField] private GameObject bookWorld;
+    [SerializeField] private GameObject frameWorld;
+
     private bool isPanelOpen = false;
 
     void Start()
@@ -60,6 +64,20 @@ public class LaptopHover : MonoBehaviour
 
             Debug.Log("Canvas dan Panel berhasil dinyalakan!");
             isPanelOpen = true;
+
+            SetWorldColliders(false);
+        }
+    }
+
+    private void SetWorldColliders(bool enable)
+    {
+        foreach (var obj in new[] { bookWorld, frameWorld })
+        {
+            if (obj != null)
+            {
+                var col = obj.GetComponent<Collider2D>();
+                if (col != null) col.enabled = enable;
+            }
         }
     }
 
@@ -68,10 +86,10 @@ public class LaptopHover : MonoBehaviour
     {
         // Matikan panelnya dulu
         if (laptopPanel != null) laptopPanel.SetActive(false);
-        
-        // Opsional: kalau mau Canvasnya dimatikan total lagi, uncomment baris di bawah:
-        // if (targetCanvas != null) targetCanvas.SetActive(false);
+        if (targetCanvas != null) targetCanvas.SetActive(false);
 
-        isPanelOpen = false; // Kembalikan state agar bisa di-klik lagi
+        isPanelOpen = false;
+
+        SetWorldColliders(true);
     }
 }

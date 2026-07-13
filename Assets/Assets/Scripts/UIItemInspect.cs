@@ -6,6 +6,10 @@ public class UIItemInspect : MonoBehaviour
 {
     [Header("Item References")]
     [SerializeField] private GameObject closedItemObject;
+
+    [Header("World Object References")]
+    [SerializeField] private GameObject bookWorld;
+    [SerializeField] private GameObject laptopWorld;
     
     [Header("Preview References")]
     [SerializeField] private GameObject previewPanel;
@@ -189,6 +193,20 @@ public class UIItemInspect : MonoBehaviour
 
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
         transitionCoroutine = StartCoroutine(FadePreview(true));
+
+        SetWorldColliders(false);
+    }
+
+    private void SetWorldColliders(bool enable)
+    {
+        foreach (var obj in new[] { bookWorld, laptopWorld })
+        {
+            if (obj != null)
+            {
+                var col = obj.GetComponent<Collider2D>();
+                if (col != null) col.enabled = enable;
+            }
+        }
     }
 
     private void ClosePreview()
@@ -199,6 +217,8 @@ public class UIItemInspect : MonoBehaviour
 
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
         transitionCoroutine = StartCoroutine(FadePreview(false));
+
+        SetWorldColliders(true);
     }
     
     public void OpenInspectFromPreview()
