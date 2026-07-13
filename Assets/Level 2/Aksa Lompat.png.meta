@@ -1,0 +1,354 @@
+fileFormatVersion: 2
+guid: 402593a9b781e9d41a4b3ebce220576c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1404543590754307946
+    second: aksa_jump_0
+  - first:
+      213: -2934089222553109268
+    second: aksa_jump_1
+  - first:
+      213: -6477660521001629529
+    second: aksa_jump_2
+  - first:
+      213: -5701922045198377336
+    second: aksa_jump_3
+  - first:
+      213: 3028489032471517160
+    second: aksa_jump_4
+  - first:
+      213: 5546881006543099938
+    second: aksa_jump_5
+  - first:
+      213: 6554497363124765312
+    second: aksa_jump_6
+  - first:
+      213: -7974325043138547292
+    second: aksa_jump_7
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 724
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: aksa_jump_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 690b989bb0f028ce0800000000000000
+      internalID: -1404543590754307946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_1
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cec7b66c5650847d0800000000000000
+      internalID: -2934089222553109268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_2
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a84026831aba16a0800000000000000
+      internalID: -6477660521001629529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_3
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88e5bf62c14bed0b0800000000000000
+      internalID: -5701922045198377336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_4
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e791aababa570a20800000000000000
+      internalID: 3028489032471517160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_5
+      rect:
+        serializedVersion: 2
+        x: 1210
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 228dc5603ea7afc40800000000000000
+      internalID: 5546881006543099938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_6
+      rect:
+        serializedVersion: 2
+        x: 1452
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0824942ef9046fa50800000000000000
+      internalID: 6554497363124765312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: aksa_jump_7
+      rect:
+        serializedVersion: 2
+        x: 1694
+        y: 0
+        width: 242
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a1b9308f91855190800000000000000
+      internalID: -7974325043138547292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      aksa_jump_0: -1404543590754307946
+      aksa_jump_0_0: 7683496812453715222
+      aksa_jump_0_1: 5420534859744487388
+      aksa_jump_0_2: -2235542977740061632
+      aksa_jump_0_3: 5292441643867163030
+      aksa_jump_0_4: -9023393299004871861
+      aksa_jump_0_5: 8600032777033135586
+      aksa_jump_0_6: -3100963036367129920
+      aksa_jump_0_7: -5815415580888903412
+      aksa_jump_1: -2934089222553109268
+      aksa_jump_1_0: -6995696136764224071
+      aksa_jump_1_1: -1259133940311300938
+      aksa_jump_1_2: -694892456698326578
+      aksa_jump_1_3: 256046324425835797
+      aksa_jump_1_4: 4987955097601486303
+      aksa_jump_1_5: -4457674112096204870
+      aksa_jump_1_6: 5445338595447986658
+      aksa_jump_1_7: 4177640995597198024
+      aksa_jump_2: -6477660521001629529
+      aksa_jump_3: -5701922045198377336
+      aksa_jump_4: 3028489032471517160
+      aksa_jump_5: 5546881006543099938
+      aksa_jump_6: 6554497363124765312
+      aksa_jump_7: -7974325043138547292
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
