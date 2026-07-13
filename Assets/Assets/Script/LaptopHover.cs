@@ -8,6 +8,10 @@ public class LaptopHover : MonoBehaviour
     [SerializeField] private GameObject laptopPanel;
     [SerializeField] private GameObject laptopOutline;
 
+    [Header("World Object References")]
+    [SerializeField] private GameObject bookWorld;
+    [SerializeField] private GameObject frameWorld;
+
     private bool isPanelOpen = false;
 
     void Start()
@@ -62,6 +66,20 @@ public class LaptopHover : MonoBehaviour
 
         Debug.Log("Canvas dan Panel berhasil dinyalakan!");
         isPanelOpen = true;
+
+        SetWorldColliders(false);
+    }
+
+    private void SetWorldColliders(bool enable)
+    {
+        foreach (var obj in new[] { bookWorld, frameWorld })
+        {
+            if (obj != null)
+            {
+                var col = obj.GetComponent<Collider2D>();
+                if (col != null) col.enabled = enable;
+            }
+        }
     }
 
     public void CloseLaptop()
@@ -70,5 +88,7 @@ public class LaptopHover : MonoBehaviour
         if (targetCanvas != null) targetCanvas.SetActive(false);
 
         isPanelOpen = false;
+
+        SetWorldColliders(true);
     }
 }
