@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class GameManager : MonoBehaviour
+namespace Level3
+{
+    public class GameManager : MonoBehaviour
 {
     [Header("UI")]
     public GameObject winUI;
@@ -50,4 +52,5 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+}
 }

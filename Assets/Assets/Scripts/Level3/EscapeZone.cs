@@ -1,4 +1,5 @@
 using UnityEngine;
+using Level3;
 
 public class EscapeZone : MonoBehaviour
 {

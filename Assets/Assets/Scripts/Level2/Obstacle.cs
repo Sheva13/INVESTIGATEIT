@@ -1,4 +1,5 @@
 using UnityEngine;
+using Level2;
 
 public class Obstacle : MonoBehaviour
 {

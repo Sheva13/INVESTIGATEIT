@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class GameManager : MonoBehaviour
+namespace Level2
+{
+    public class GameManager : MonoBehaviour
 {
     [Header("UI")]
     public GameObject winUI;
@@ -52,4 +54,5 @@ public class GameManager : MonoBehaviour
         CancelInvoke();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+}
 }
