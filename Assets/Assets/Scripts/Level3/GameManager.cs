@@ -26,6 +26,10 @@ public class GameManager : MonoBehaviour
     public Image fadeOverlay;
     public float fadeDuration = 1.5f;
 
+    [Header("Trap System")]
+    public int totalTraps = 5;
+    public int trapsTriggered = 0;
+
     [Header("Gameplay State")]
     public bool hasLoot = false;
 
@@ -73,10 +77,33 @@ public class GameManager : MonoBehaviour
     public void ShowNotification(string message, Color color, float duration = 3f)
     {
         if (notificationText == null) return;
+        if (string.IsNullOrEmpty(message))
+        {
+            notificationText.gameObject.SetActive(false);
+            return;
+        }
         notificationText.text = message;
         notificationText.color = color;
         notificationText.gameObject.SetActive(true);
         notifTimer = duration;
+    }
+
+    public void HideNotification()
+    {
+        if (notificationText != null)
+            notificationText.gameObject.SetActive(false);
+    }
+
+    public void RegisterTrapTriggered(string areaName)
+    {
+        trapsTriggered++;
+        ShowNotification($"Area {areaName} berhasil dijebak! ({trapsTriggered}/{totalTraps})", Color.green, 3f);
+
+        if (trapsTriggered >= totalTraps)
+        {
+            ShowNotification("Semua area aman! Mencari kemenangan...", Color.yellow, 2f);
+            Invoke(nameof(WinGame), 2f);
+        }
     }
 
     public void WinGame()

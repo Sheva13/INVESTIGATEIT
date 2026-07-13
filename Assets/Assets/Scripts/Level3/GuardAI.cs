@@ -107,6 +107,13 @@ public class GuardAI : MonoBehaviour
     {
         if (agent == null || !agent.isOnNavMesh) return;
 
+        if (currentState == GuardState.Trapped)
+        {
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         agent.nextPosition = new Vector3(transform.position.x, 0f, transform.position.y);
 
         Vector2 rawDir = new Vector2(agent.desiredVelocity.x, agent.desiredVelocity.z);
@@ -132,6 +139,13 @@ public class GuardAI : MonoBehaviour
     void Update()
     {
         if (agent == null || !agent.isOnNavMesh) return;
+
+        if (currentState == GuardState.Trapped)
+        {
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+            return;
+        }
 
         CheckForPlayer();
 

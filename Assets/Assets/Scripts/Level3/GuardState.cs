@@ -4,5 +4,6 @@ public enum GuardState
     Alert,
     Chase,
     Search,
-    Return
+    Return,
+    Trapped
 }
