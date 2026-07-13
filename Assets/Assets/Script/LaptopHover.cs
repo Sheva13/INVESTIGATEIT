@@ -47,8 +47,7 @@ public class LaptopHover : MonoBehaviour
 
     void OnMouseDown()
     {
-        // Blokir klik kalau panel sedang terbuka ATAU pointer di atas UI (mencegah klik tembus)
-        if (isPanelOpen || EventSystem.current.IsPointerOverGameObject())
+        if (isPanelOpen)
         {
             return;
         }
