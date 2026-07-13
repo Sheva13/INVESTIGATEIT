@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput.Normalize();
-
+        
         bool isMoving = moveInput.sqrMagnitude > 0.01f;
         if (isMoving)
         {
@@ -64,14 +64,14 @@ public class PlayerController : MonoBehaviour
         {
             stepTimer = 0f;
         }
-
+        
         if (animator != null)
         {
             animator.SetFloat("MoveX", facingDir.x);
             animator.SetFloat("MoveY", facingDir.y);
             animator.SetFloat("Speed", moveInput.magnitude);
         }
-
+        
         if (Input.GetMouseButtonDown(1))
             TryThrow();
     }
@@ -99,18 +99,17 @@ public class PlayerController : MonoBehaviour
     void TryThrow()
     {
         if (currentThrowables <= 0 || throwablePrefab == null) return;
-
-        Vector3 spawnPos = transform.position + (Vector3)facingDir * 1f;
-        Vector3 dir = facingDir;
-        Vector3 targetPos = spawnPos + (Vector3)dir * throwRange;
-
-        RaycastHit2D hit = Physics2D.Raycast(spawnPos, dir, throwRange);
+        
+        Vector3 spawnPos = throwSpawnPoint ? throwSpawnPoint.position : transform.position;
+        Vector3 targetPos = spawnPos + (Vector3)facingDir * throwRange;
+        
+        RaycastHit2D hit = Physics2D.Raycast(spawnPos, facingDir, throwRange);
         if (hit.collider != null)
             targetPos = hit.point;
-
+        
         GameObject obj = Instantiate(throwablePrefab, spawnPos, Quaternion.identity);
         obj.GetComponent<ThrowableObject>()?.Throw(targetPos);
-
+        
         currentThrowables--;
     }
 
