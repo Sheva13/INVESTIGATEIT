@@ -1,0 +1,87 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "7789ee5b-b12a-493f-8ce3-50cf0231fe30",
+        "name": "Character Description:\nA young male high school student with a large rounded brown hairstyle that covers part of the forehead and ears. Fair skin, small black eyes with a calm and determined expression, tiny nose, no facial hair. Wearing a short-sleeve white school uniform shirt tucked into dark gray-blue trousers with a black belt. A medium blue necktie hanging naturally. Brown leather shoes. Slim teenage body proportions with a slightly oversized head in classic JRPG style.\n\nLighting & Colors:\nWarm brown hair with darker highlights, white shirt with subtle gray shadows, blue-gray pants, medium blue tie, brown shoes, soft directional lighting, clean shading without excessive detail.",
+        "prompt": "Character Description:\nA young male high school student with a large rounded brown hairstyle that covers part of the forehead and ears. Fair skin, small black eyes with a calm and determined expression, tiny nose, no facial hair. Wearing a short-sleeve white school uniform shirt tucked into dark gray-blue trousers with a black belt. A medium blue necktie hanging naturally. Brown leather shoes. Slim teenage body proportions with a slightly oversized head in classic JRPG style.\n\nLighting & Colors:\nWarm brown hair with darker highlights, white shirt with subtle gray shadows, blue-gray pants, medium blue tie, brown shoes, soft directional lighting, clean shading without excessive detail.",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-07-13T05:44:33.485921+00:00"
+      },
+      "folder": "Character_Description_A_young_male_high_school_stu",
+      "frames": {
+        "rotations": {
+          "south": "Character_Description_A_young_male_high_school_stu/rotations/south.png",
+          "south-east": "Character_Description_A_young_male_high_school_stu/rotations/south-east.png",
+          "east": "Character_Description_A_young_male_high_school_stu/rotations/east.png",
+          "north-east": "Character_Description_A_young_male_high_school_stu/rotations/north-east.png",
+          "north": "Character_Description_A_young_male_high_school_stu/rotations/north.png",
+          "north-west": "Character_Description_A_young_male_high_school_stu/rotations/north-west.png",
+          "west": "Character_Description_A_young_male_high_school_stu/rotations/west.png",
+          "south-west": "Character_Description_A_young_male_high_school_stu/rotations/south-west.png"
+        },
+        "animations": {
+          "Walking": {
+            "north-west": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-west/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-west/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-west/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-west/frame_003.png"
+            ],
+            "west": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/west/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/west/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/west/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/west/frame_003.png"
+            ],
+            "north": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north/frame_003.png"
+            ],
+            "south-east": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-east/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-east/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-east/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-east/frame_003.png"
+            ],
+            "north-east": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-east/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-east/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-east/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/north-east/frame_003.png"
+            ],
+            "east": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/east/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/east/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/east/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/east/frame_003.png"
+            ],
+            "south-west": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-west/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-west/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-west/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south-west/frame_003.png"
+            ],
+            "south": [
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south/frame_000.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south/frame_001.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south/frame_002.png",
+              "Character_Description_A_young_male_high_school_stu/animations/Walking/south/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-07-13T06:01:12.927574"
+}
