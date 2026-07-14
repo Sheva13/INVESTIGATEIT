@@ -63,6 +63,7 @@ public class GuardAI : MonoBehaviour
         agent.updateUpAxis = false;
         agent.stoppingDistance = patrolStoppingDistance;
         agent.acceleration = 6f;
+        agent.obstacleAvoidanceType = ObstacleAvoidanceType.High;
 
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
