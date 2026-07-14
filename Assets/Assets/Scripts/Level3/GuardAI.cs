@@ -332,11 +332,16 @@ public class GuardAI : MonoBehaviour
 
     public void HearNoise(Vector3 position)
     {
-        if (currentState == GuardState.Chase) return;
-
         lastKnownPosition = position;
         hasTarget = true;
         investigateTimer = 0f;
+
+        if (currentState == GuardState.Chase)
+        {
+            noSightTimer = 0f;
+            chaseUpdateTimer = 0f;
+        }
+
         currentState = GuardState.Search;
     }
 

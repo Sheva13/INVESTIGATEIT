@@ -33,12 +33,15 @@ public class GameManager : MonoBehaviour
     public bool hasLoot = false;
 
     private bool isGameOver = false;
+    private bool isRestarting = false;
 
     void Awake()
     {
         if (!player) player = FindAnyObjectByType<PlayerController>();
         hasLoot = false;
         isGameOver = false;
+        isRestarting = false;
+        Time.timeScale = 1f;
     }
 
     void Start()
@@ -58,9 +61,6 @@ public class GameManager : MonoBehaviour
         {
             canCountText.text = $"{player.GetThrowableCount()}";
         }
-
-        if (Input.GetKeyDown(KeyCode.R))
-            RestartLevel();
     }
 
     public void ShowNotification(string message, Color color, float duration = 3f)
@@ -134,8 +134,34 @@ public class GameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        isGameOver = false;
+        if (isRestarting) return;
+        StartCoroutine(RestartWithFade());
+    }
+
+    IEnumerator RestartWithFade()
+    {
+        isRestarting = true;
         Time.timeScale = 1f;
+
+        if (fadeOverlay != null)
+        {
+            fadeOverlay.gameObject.SetActive(true);
+            Color c = fadeOverlay.color;
+            c.a = 0f;
+            fadeOverlay.color = c;
+
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                c.a = Mathf.Clamp01(elapsed / fadeDuration);
+                fadeOverlay.color = c;
+                yield return null;
+            }
+            c.a = 1f;
+            fadeOverlay.color = c;
+        }
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
