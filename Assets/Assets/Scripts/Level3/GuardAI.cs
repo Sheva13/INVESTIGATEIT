@@ -1,453 +1,489 @@
 using UnityEngine;
-using UnityEngine.AI;
+using Level3;
+
+public enum GuardState
+{
+    Patrol,
+    Alert,
+    Investigate,
+    Return
+}
 
 public class GuardAI : MonoBehaviour
 {
-    [Header("Patrol")]
+    [Header("Patrol Settings")]
     public Transform[] waypoints;
-    public float patrolSpeed = 1.2f;
-    public float chaseSpeed = 2.5f;
-    public float waypointWaitTime = 1f;
+    public float patrolSpeed = 2f;
+    public float chaseSpeed = 3.5f;
+    public float investigateSpeed = 2.5f;
 
-    [Header("Detection")]
-    public float hearingRange = 6f;
-    public float sightRange = 10f;
-    [Range(0, 360)]
-    public float sightAngle = 100f;
+    [Header("Detection Settings")]
+    public float visionRange = 5f;
+    public float visionAngle = 90f;
+    public float hearingRange = 7f;
+    public float catchDistance = 0.8f;
+    public float alertDuration = 3f;
+    public float investigateDuration = 2f;
     public LayerMask obstacleMask;
-
-    [Header("Footstep Audio")]
-    public AudioClip[] footstepClips;
-    public float footstepInterval = 0.6f;
-    public float footstepVolume = 0.8f;
+    public LayerMask playerMask;
 
     [Header("State")]
     public GuardState currentState = GuardState.Patrol;
 
-    public int PreviousWaypointIndex { get; private set; }
-    public int CurrentWaypointIndex { get; private set; }
+    [Header("Directional Sprites")]
+    public Sprite[] directionSprites;
 
-    private NavMeshAgent agent;
+    [Header("Animator")]
+    public RuntimeAnimatorController guardAnimatorController;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip[] footstepClips;
+    public AudioClip caughtClip;
+    public float stepInterval = 0.5f;
+
+    [Header("References")]
+    public Transform player;
+    public GameManager gameManager;
+
+    private Animator anim;
+    private float stepTimer = 0f;
+    private int wpIndex = 0;
+    private Vector2 lastKnownPlayerPos;
+    private Vector2 investigateTarget;
+    private float stateTimer = 0f;
+    private float chaseTimer = 0f; // Tracks continuous chase duration
+    private float waypointTime = 0f; // Stuck timeout timer
+    private Vector2 lastPosition; // Tracks last position to detect physical stuckness
+    private float stuckCheckTimer = 0f; // Stuck check interval timer
+    private Vector2 alertSteerOffset = Vector2.zero; // Sideways nudge to get unstuck in Alert state
+    private float alertSteerTimer = 0f; // Remaining duration of steering nudge
     private Rigidbody2D rb;
-    private Animator animator;
-    private AudioSource audioSource;
-    private Vector2 animMoveDir;
-    private Vector2 smoothMoveDir;
-    private float waitTimer;
-    private float footstepTimer;
-    private float chaseUpdateTimer;
-    private int patrolDirection = 1;
-    private Vector3 lastKnownPosition;
-    private Vector3 chaseTargetPosition;
-    private bool hasTarget;
-    private bool playerWasVisible;
-    private float noSightTimer;
-    private float searchWaitTimer;
-    private static int closestGuardFrame = -1;
-    private static GuardAI closestGuardCache;
-    private const float movementSmoothSpeed = 6f;
-    private const float chaseStoppingDistance = 1.2f;
-    private const float patrolStoppingDistance = 0.1f;
-    private const float chaseUpdateInterval = 0.3f;
-    private const float chaseUpdateDistThreshold = 2f;
-    private const float captureDistance = 0.8f;
+    private SpriteRenderer sprite;
+    private Vector2 facingDir = Vector2.right;
+    private LineRenderer visionLineRenderer;
+    private int frameCounter = 0;
 
     void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        if (agent == null)
-            agent = gameObject.AddComponent<NavMeshAgent>();
-
-        agent.updatePosition = false;
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
-        agent.stoppingDistance = patrolStoppingDistance;
-        agent.acceleration = 6f;
-
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
+        sprite = GetComponent<SpriteRenderer>();
+        if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (!gameManager) gameManager = FindAnyObjectByType<GameManager>();
+        if (!audioSource) audioSource = GetComponent<AudioSource>();
         if (audioSource != null)
         {
             audioSource.spatialBlend = 0f;
-            audioSource.playOnAwake = false;
-            audioSource.volume = footstepVolume;
+            audioSource.volume = 0.6f;
+        }
+        else Debug.LogWarning($"{gameObject.name}: AudioSource missing!");
+
+        // Create or find child GameObject for Vision Cone rendering
+        Transform existingCone = transform.Find("VisionCone");
+        GameObject coneObj;
+        if (existingCone != null)
+        {
+            coneObj = existingCone.gameObject;
+        }
+        else
+        {
+            coneObj = new GameObject("VisionCone");
+            coneObj.transform.SetParent(transform);
+            coneObj.transform.localPosition = Vector3.zero;
+            coneObj.transform.localRotation = Quaternion.identity;
         }
 
-        if (waypoints == null || waypoints.Length == 0)
-            FindWaypoints();
-        closestGuardFrame = -1;
-        closestGuardCache = null;
+        visionLineRenderer = coneObj.GetComponent<LineRenderer>();
+        if (visionLineRenderer == null)
+        {
+            visionLineRenderer = coneObj.AddComponent<LineRenderer>();
+        }
+
+        visionLineRenderer.useWorldSpace = false;
+        visionLineRenderer.positionCount = 3;
+        visionLineRenderer.loop = true;
+        visionLineRenderer.startWidth = 0.05f;
+        visionLineRenderer.endWidth = 0.05f;
+        
+        var defaultMat = new Material(Shader.Find("Sprites/Default"));
+        visionLineRenderer.material = defaultMat;
+        visionLineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        visionLineRenderer.receiveShadows = false;
+        visionLineRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
     }
 
     void Start()
     {
-        if (agent != null)
+        transform.rotation = Quaternion.identity;
+        facingDir = transform.right;
+        if (waypoints != null && waypoints.Length > 0)
         {
-            agent.updatePosition = false;
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
+            transform.position = waypoints[0].position;
+        }
+        lastPosition = transform.position;
+
+        // Set up Animator
+        anim = GetComponent<Animator>();
+        if (anim == null) anim = gameObject.AddComponent<Animator>();
+        if (guardAnimatorController != null)
+        {
+            anim.runtimeAnimatorController = guardAnimatorController;
         }
 
-        if (waypoints != null && waypoints.Length > 0 && waypoints[0] != null)
-        {
-            transform.position = new Vector3(waypoints[0].position.x, waypoints[0].position.y, transform.position.z);
-        }
-
-        if (agent != null && agent.isActiveAndEnabled)
-        {
-            Vector3 originalPos = transform.position;
-            agent.Warp(new Vector3(originalPos.x, 0f, originalPos.y));
-            transform.position = originalPos;
-            SetDestination(waypoints[0].position);
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (agent == null || !agent.isOnNavMesh) return;
-
-        if (currentState == GuardState.Trapped)
-        {
-            if (rb != null)
-                rb.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        agent.nextPosition = new Vector3(transform.position.x, 0f, transform.position.y);
-
-        Vector2 rawDir = new Vector2(agent.desiredVelocity.x, agent.desiredVelocity.z);
-
-        if (rawDir.sqrMagnitude < 0.01f && agent.hasPath)
-        {
-            Vector3 target3D = agent.destination;
-            rawDir = new Vector2(target3D.x - transform.position.x, target3D.z - transform.position.y);
-        }
-
-        rawDir = rawDir.normalized;
-
-        smoothMoveDir = Vector2.MoveTowards(smoothMoveDir, rawDir, movementSmoothSpeed * Time.fixedDeltaTime);
-        animMoveDir = smoothMoveDir;
-        float currentSpeed = (currentState == GuardState.Chase) ? chaseSpeed : patrolSpeed;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = smoothMoveDir * currentSpeed;
-        }
+        UpdateSpriteDirection();
     }
 
     void Update()
     {
-        if (agent == null || !agent.isOnNavMesh) return;
-
-        if (currentState == GuardState.Trapped)
+        // Universal physical stuck detection (1.0s interval)
+        stuckCheckTimer += Time.deltaTime;
+        if (stuckCheckTimer >= 1.0f)
         {
-            if (rb != null)
-                rb.linearVelocity = Vector2.zero;
-            return;
-        }
+            bool isTryingToMove = currentState == GuardState.Patrol || 
+                                  currentState == GuardState.Return || 
+                                  currentState == GuardState.Investigate || 
+                                  currentState == GuardState.Alert;
 
-        CheckForPlayer();
+            if (isTryingToMove && Vector2.Distance(transform.position, lastPosition) < 0.15f)
+            {
+                if (currentState == GuardState.Patrol)
+                {
+                    wpIndex = (wpIndex + 1) % waypoints.Length;
+                    Debug.Log($"Guard {gameObject.name} stuck in Patrol. Skipping to next waypoint.");
+                }
+                else if (currentState == GuardState.Return)
+                {
+                    currentState = GuardState.Patrol;
+                    Debug.Log($"Guard {gameObject.name} stuck in Return. Forcing patrol.");
+                }
+                else if (currentState == GuardState.Investigate)
+                {
+                    currentState = GuardState.Return;
+                    Debug.Log($"Guard {gameObject.name} stuck in Investigate. Returning to patrol.");
+                }
+                else if (currentState == GuardState.Alert && player != null)
+                {
+                    // Pick a random perpendicular direction relative to player heading to steer around obstacle
+                    Vector2 targetDir = ((Vector2)player.position - (Vector2)transform.position).normalized;
+                    alertSteerOffset = new Vector2(-targetDir.y, targetDir.x) * (Random.value < 0.5f ? 1.5f : -1.5f);
+                    alertSteerTimer = 0.8f;
+                    Debug.Log($"Guard {gameObject.name} stuck in Alert. Applying sideways steer offset.");
+                }
+                waypointTime = 0f;
+            }
+            lastPosition = transform.position;
+            stuckCheckTimer = 0f;
+        }
 
         switch (currentState)
         {
-            case GuardState.Patrol:
-            case GuardState.Return:
-                UpdatePatrol();
-                break;
-            case GuardState.Chase:
-                UpdateChase();
-                break;
-            case GuardState.Search:
-                UpdateSearch();
-                break;
+            case GuardState.Patrol: PatrolUpdate(); break;
+            case GuardState.Alert: AlertUpdate(); break;
+            case GuardState.Investigate: InvestigateUpdate(); break;
+            case GuardState.Return: ReturnUpdate(); break;
         }
 
-        if (animator != null)
+        CheckVision();
+        UpdateColor();
+        UpdateSpriteDirection();
+        if (anim != null) anim.SetFloat("Speed", rb.linearVelocity.magnitude);
+
+        // Footstep audio
+        bool isMoving = rb.linearVelocity.sqrMagnitude > 0.01f;
+        if (isMoving)
         {
-            float speed = rb != null ? rb.linearVelocity.magnitude : 0f;
-            animator.SetFloat("Speed", speed);
-            if (speed > 0.1f)
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f)
             {
-                animator.SetFloat("MoveX", animMoveDir.x);
-                animator.SetFloat("MoveY", animMoveDir.y);
+                PlayFootstep();
+                stepTimer = stepInterval;
             }
-        }
-
-        UpdateFootstep();
-    }
-
-    void CheckForPlayer()
-    {
-        GameManager gm = FindAnyObjectByType<GameManager>();
-        if (gm == null || gm.player == null) return;
-
-        Vector2 guardPos = transform.position;
-        Vector2 playerPos = gm.player.transform.position;
-        Vector2 dirToPlayer = playerPos - guardPos;
-        float distToPlayer = dirToPlayer.magnitude;
-
-        if (distToPlayer > sightRange) return;
-
-        bool inCone = false;
-        if (currentState == GuardState.Search)
-        {
-            inCone = true;
-        }
-        else if (smoothMoveDir.sqrMagnitude > 0.01f)
-        {
-            float dot = Vector2.Dot(smoothMoveDir.normalized, dirToPlayer.normalized);
-            float coneThreshold = Mathf.Cos(sightAngle * 0.5f * Mathf.Deg2Rad);
-            inCone = dot >= coneThreshold;
         }
         else
         {
-            inCone = distToPlayer <= 4f;
+            stepTimer = 0f;
         }
 
-        if (!inCone) return;
-
-        RaycastHit2D hit = Physics2D.Raycast(guardPos, dirToPlayer.normalized, distToPlayer, obstacleMask);
-        if (hit.collider != null) return;
-
-        lastKnownPosition = playerPos;
-        hasTarget = true;
-
-        if (currentState != GuardState.Chase)
-        {
-            currentState = GuardState.Chase;
-            agent.stoppingDistance = chaseStoppingDistance;
-            chaseTargetPosition = playerPos;
-            chaseUpdateTimer = 0f;
-        }
+        frameCounter++;
+        if (frameCounter % 3 == 0)
+            UpdateVisionCone();
     }
 
-    void FindWaypoints()
+    void UpdateVisionCone()
     {
-        string wpName = gameObject.name + "_WPs";
+        if (visionLineRenderer == null) return;
 
-        Transform wpParent = null;
-        if (transform.parent != null)
-        {
-            wpParent = transform.parent.Find(wpName);
-        }
+        Vector3 facing3 = new Vector3(facingDir.x, facingDir.y, 0f);
+        if (facing3.sqrMagnitude < 0.001f) facing3 = Vector3.right;
 
-        if (wpParent == null)
-        {
-            var go = GameObject.Find(wpName);
-            if (go != null) wpParent = go.transform;
-        }
+        float halfAngle = visionAngle * 0.5f;
+        Vector3 leftDir = Quaternion.Euler(0, 0, -halfAngle) * facing3;
+        Vector3 rightDir = Quaternion.Euler(0, 0, halfAngle) * facing3;
 
-        if (wpParent != null)
+        visionLineRenderer.useWorldSpace = true;
+        visionLineRenderer.SetPosition(0, transform.position);
+        visionLineRenderer.SetPosition(1, transform.position + leftDir * visionRange);
+        visionLineRenderer.SetPosition(2, transform.position + rightDir * visionRange);
+
+        Color coneColor = currentState switch
         {
-            waypoints = new Transform[wpParent.childCount];
-            for (int i = 0; i < wpParent.childCount; i++)
-                waypoints[i] = wpParent.GetChild(i);
-        }
+            GuardState.Patrol => new Color(0f, 1f, 0f, 0.4f), // Translucent green
+            GuardState.Alert => (chaseTimer > 1.5f) ? new Color(1f, 0f, 0f, 0.8f) : new Color(1f, 0f, 0f, 0.4f), // VERY red when angry
+            GuardState.Investigate => new Color(1f, 0.5f, 0f, 0.4f), // Translucent orange
+            GuardState.Return => new Color(1f, 1f, 0f, 0.4f), // Translucent yellow
+            _ => new Color(1f, 1f, 1f, 0.4f)
+        };
+
+        visionLineRenderer.startColor = coneColor;
+        visionLineRenderer.endColor = coneColor;
     }
 
-    void UpdatePatrol()
+    void PatrolUpdate()
     {
         if (waypoints == null || waypoints.Length == 0) return;
 
-        agent.speed = patrolSpeed;
-
-        if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance)
+        waypointTime += Time.deltaTime;
+        if (waypointTime > 8.0f)
         {
-            waitTimer += Time.deltaTime;
-            if (waitTimer >= waypointWaitTime)
+            wpIndex = (wpIndex + 1) % waypoints.Length;
+            waypointTime = 0f;
+            Debug.Log($"Guard {gameObject.name} stuck timeout! Moving to next waypoint.");
+        }
+
+        Transform target = waypoints[wpIndex];
+        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
+        Vector2 avoidDir = AvoidObstacles(dir);
+        rb.linearVelocity = avoidDir * patrolSpeed;
+        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+            facingDir = rb.linearVelocity.normalized;
+
+        if (Vector2.Distance(transform.position, target.position) < 0.3f)
+        {
+            wpIndex = (wpIndex + 1) % waypoints.Length;
+            waypointTime = 0f;
+        }
+    }
+
+    void AlertUpdate()
+    {
+        if (!player) return;
+
+        chaseTimer += Time.deltaTime;
+        float currentSpeed = chaseSpeed;
+        if (chaseTimer > 1.5f)
+        {
+            currentSpeed = chaseSpeed * 1.25f; // Runs slightly faster (25% boost) when vision is VERY red
+        }
+
+        Vector2 dir = ((Vector2)player.position - (Vector2)transform.position).normalized;
+        if (alertSteerTimer > 0f)
+        {
+            alertSteerTimer -= Time.deltaTime;
+            dir = (dir + alertSteerOffset).normalized;
+        }
+
+        Vector2 avoidDir = AvoidObstacles(dir);
+        rb.linearVelocity = avoidDir * currentSpeed;
+        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+            facingDir = rb.linearVelocity.normalized;
+
+        if (Vector2.Distance(transform.position, player.position) < catchDistance)
+        {
+            if (caughtClip != null && audioSource != null)
+                audioSource.PlayOneShot(caughtClip);
+            gameManager?.LoseGame();
+        }
+
+        if (CanSeePlayer())
+        {
+            lastKnownPlayerPos = player.position;
+            stateTimer = 0f;
+        }
+        else
+        {
+            stateTimer += Time.deltaTime;
+            if (stateTimer >= alertDuration)
             {
-                waitTimer = 0f;
-                PreviousWaypointIndex = CurrentWaypointIndex;
-
-                int nextIndex = CurrentWaypointIndex + patrolDirection;
-                if (nextIndex >= waypoints.Length || nextIndex < 0)
-                {
-                    patrolDirection *= -1;
-                    nextIndex = CurrentWaypointIndex + patrolDirection;
-                }
-
-                CurrentWaypointIndex = nextIndex;
-                SetDestination(waypoints[CurrentWaypointIndex].position);
+                investigateTarget = lastKnownPlayerPos;
+                currentState = GuardState.Investigate;
+                stateTimer = 0f;
+                chaseTimer = 0f; // Reset chase timer
             }
         }
     }
 
-    void UpdateChase()
+    void InvestigateUpdate()
     {
-        agent.speed = chaseSpeed;
+        chaseTimer = 0f;
+        Vector2 dir = (investigateTarget - (Vector2)transform.position).normalized;
+        Vector2 avoidDir = AvoidObstacles(dir);
+        rb.linearVelocity = avoidDir * investigateSpeed;
+        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+            facingDir = rb.linearVelocity.normalized;
 
-        if (!hasTarget) return;
-
-        GameManager gm = FindAnyObjectByType<GameManager>();
-        if (gm != null && gm.player != null)
+        if (Vector2.Distance(transform.position, investigateTarget) < 0.5f)
         {
-            Vector2 playerPos = gm.player.transform.position;
-            Vector2 guardPos = transform.position;
-            Vector2 dirToPlayer = playerPos - guardPos;
-            float dist = dirToPlayer.magnitude;
-
-            if (dist <= captureDistance)
+            stateTimer += Time.deltaTime;
+            rb.linearVelocity = Vector2.zero;
+            if (stateTimer >= investigateDuration)
             {
-                gm.LoseGame();
-                return;
+                currentState = GuardState.Return;
+                stateTimer = 0f;
             }
+        }
+    }
 
-            bool stillVisible = dist <= sightRange;
-            if (stillVisible)
-            {
-                Vector2 lookDir = (smoothMoveDir.sqrMagnitude > 0.01f) ? smoothMoveDir.normalized : dirToPlayer.normalized;
-                float dot = Vector2.Dot(lookDir, dirToPlayer.normalized);
-                float coneThreshold = Mathf.Cos(sightAngle * 0.5f * Mathf.Deg2Rad);
-                if (dot >= coneThreshold || smoothMoveDir.sqrMagnitude <= 0.01f)
-                {
-                    RaycastHit2D hit = Physics2D.Raycast(guardPos, dirToPlayer.normalized, dist, obstacleMask);
-                    if (hit.collider != null) stillVisible = false;
-                }
-                else
-                {
-                    stillVisible = false;
-                }
-            }
+    void ReturnUpdate()
+    {
+        chaseTimer = 0f; // Reset chase timer
+        if (waypoints == null || waypoints.Length == 0) return;
 
-            if (stillVisible)
+        waypointTime += Time.deltaTime;
+        if (waypointTime > 8.0f)
+        {
+            currentState = GuardState.Patrol;
+            waypointTime = 0f;
+            Debug.Log($"Guard {gameObject.name} stuck timeout on return! Forcing patrol state.");
+        }
+
+        Transform target = waypoints[wpIndex];
+        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
+        Vector2 avoidDir = AvoidObstacles(dir);
+        rb.linearVelocity = avoidDir * patrolSpeed;
+        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+            facingDir = rb.linearVelocity.normalized;
+
+        if (Vector2.Distance(transform.position, target.position) < 0.3f)
+        {
+            currentState = GuardState.Patrol;
+            waypointTime = 0f;
+        }
+    }
+
+    void CheckVision()
+    {
+        if (!player || currentState == GuardState.Alert) return;
+        if (CanSeePlayer())
+        {
+            lastKnownPlayerPos = player.position;
+            currentState = GuardState.Alert;
+            stateTimer = 0f;
+            chaseTimer = 0f; // Reset chase timer
+        }
+    }
+
+    bool CanSeePlayer()
+    {
+        if (!player) return false;
+        Vector2 dirToPlayer = (Vector2)player.position - (Vector2)transform.position;
+        float dist = dirToPlayer.magnitude;
+        if (dist > visionRange) return false;
+
+        float angle = Vector2.Angle(facingDir, dirToPlayer.normalized);
+        if (angle > visionAngle * 0.5f) return false;
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dirToPlayer.normalized, dist, obstacleMask | playerMask);
+        if (hit.collider == null) return false;
+        if (hit.collider.gameObject == gameObject) return false;
+        return hit.collider.CompareTag("Player");
+    }
+
+    void UpdateSpriteDirection()
+    {
+        if (directionSprites == null || directionSprites.Length < 8 || sprite == null) return;
+        if (facingDir.sqrMagnitude < 0.001f) return;
+
+        float angle = Mathf.Atan2(facingDir.y, facingDir.x) * Mathf.Rad2Deg;
+        if (angle < 0f) angle += 360f;
+
+        int index;
+        if (angle >= 337.5f || angle < 22.5f) index = 2;      // E
+        else if (angle >= 22.5f && angle < 67.5f) index = 1;   // NE
+        else if (angle >= 67.5f && angle < 112.5f) index = 0;  // N
+        else if (angle >= 112.5f && angle < 157.5f) index = 7; // NW
+        else if (angle >= 157.5f && angle < 202.5f) index = 6; // W
+        else if (angle >= 202.5f && angle < 247.5f) index = 5; // SW
+        else if (angle >= 247.5f && angle < 292.5f) index = 4; // S
+        else index = 3; // SE
+
+        sprite.sprite = directionSprites[index];
+    }
+
+    void RotateTowards(Vector2 dir)
+    {
+        // Transform rotation is no longer used — sprite direction is handled
+        // by UpdateSpriteDirection() and vision cone by UpdateVisionCone()
+    }
+
+    void UpdateColor()
+    {
+        if (!sprite) return;
+        if (directionSprites != null && directionSprites.Length >= 8)
+        {
+            sprite.color = Color.white;
+            return;
+        }
+        sprite.color = currentState switch
+        {
+            GuardState.Patrol => Color.green,
+            GuardState.Alert => (chaseTimer > 1.5f) ? new Color(0.7f, 0f, 0f) : Color.red,
+            GuardState.Investigate => new Color(1f, 0.5f, 0f),
+            GuardState.Return => Color.yellow,
+            _ => Color.white
+        };
+    }
+
+    // Projects the desired direction to slide smoothly around obstacles
+    Vector2 AvoidObstacles(Vector2 desiredDir)
+    {
+        // Start raycast slightly in front of the guard's body (0.4f radius offset)
+        Vector2 origin = (Vector2)transform.position + desiredDir * 0.4f;
+        RaycastHit2D hit = Physics2D.Raycast(origin, desiredDir, 0.8f, obstacleMask);
+        if (hit.collider != null)
+        {
+            Vector2 hitNormal = hit.normal;
+            Vector2 slideDir = desiredDir - Vector2.Dot(desiredDir, hitNormal) * hitNormal;
+            if (slideDir.sqrMagnitude > 0.01f)
             {
-                lastKnownPosition = playerPos;
-                noSightTimer = 0f;
+                return slideDir.normalized;
             }
             else
             {
-                noSightTimer += Time.deltaTime;
-            }
-
-            if (noSightTimer >= 2f)
-            {
-                currentState = GuardState.Search;
-                return;
+                // Fallback to perpendicular direction
+                return new Vector2(-hitNormal.y, hitNormal.x).normalized;
             }
         }
-
-        chaseUpdateTimer += Time.deltaTime;
-        float distToTarget = Vector2.Distance(transform.position, chaseTargetPosition);
-        if (chaseUpdateTimer >= chaseUpdateInterval || distToTarget > chaseUpdateDistThreshold)
-        {
-            chaseTargetPosition = lastKnownPosition;
-            SetDestination(lastKnownPosition);
-            chaseUpdateTimer = 0f;
-        }
-
-        if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance)
-        {
-            currentState = GuardState.Search;
-        }
-    }
-
-    void UpdateSearch()
-    {
-        CheckForPlayer();
-
-        if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance)
-        {
-            searchWaitTimer += Time.deltaTime;
-            if (searchWaitTimer >= 1.5f)
-            {
-                ReturnToPatrol();
-            }
-        }
-    }
-
-    void UpdateFootstep()
-    {
-        if (footstepClips == null || footstepClips.Length == 0) return;
-        if (audioSource == null) return;
-
-        float currentSpeed = (currentState == GuardState.Chase) ? chaseSpeed : patrolSpeed;
-        float effectiveSpeed = smoothMoveDir.magnitude * currentSpeed;
-        if (effectiveSpeed <= 0.01f) return;
-        if (currentState == GuardState.Chase) return;
-
-        if (!IsClosestGuardToPlayerCached()) return;
-
-        footstepTimer -= Time.deltaTime;
-        if (footstepTimer <= 0f)
-        {
-            PlayFootstep();
-            footstepTimer = footstepInterval;
-        }
-    }
-
-    bool IsClosestGuardToPlayerCached()
-    {
-        int currentFrame = Time.frameCount;
-        if (currentFrame != closestGuardFrame)
-        {
-            closestGuardFrame = currentFrame;
-            GameManager gm = FindAnyObjectByType<GameManager>();
-            if (gm == null || gm.player == null)
-            {
-                closestGuardCache = null;
-                return false;
-            }
-
-            GuardAI best = null;
-            float bestDist = float.MaxValue;
-            Vector2 playerPos = gm.player.transform.position;
-
-            var guards = FindObjectsByType<GuardAI>(FindObjectsSortMode.None);
-            foreach (var guard in guards)
-            {
-                if (guard == null) continue;
-                float d = Vector2.Distance(guard.transform.position, playerPos);
-                if (d < bestDist)
-                {
-                    bestDist = d;
-                    best = guard;
-                }
-            }
-            closestGuardCache = best;
-        }
-        return closestGuardCache == this;
+        return desiredDir;
     }
 
     void PlayFootstep()
     {
         if (audioSource == null || footstepClips == null || footstepClips.Length == 0) return;
         var clip = footstepClips[Random.Range(0, footstepClips.Length)];
-        if (clip == null) return;
-        audioSource.pitch = 1f + Random.Range(-0.08f, 0.08f);
-        audioSource.volume = footstepVolume;
+        if (clip == null) { Debug.LogWarning($"{gameObject.name} footstep clip is null!"); return; }
+        audioSource.pitch = 1f + Random.Range(-0.1f, 0.1f);
+        audioSource.volume = Random.Range(0.7f, 1f);
         audioSource.PlayOneShot(clip);
     }
 
-    void SetDestination(Vector3 position)
+    public void HearNoise(Vector2 noisePos)
     {
-        if (agent != null && agent.isOnNavMesh)
-            agent.SetDestination(new Vector3(position.x, 0f, position.y));
+        float dist = Vector2.Distance(transform.position, noisePos);
+        if (dist > hearingRange) return;
+
+        if (currentState == GuardState.Patrol || currentState == GuardState.Return || currentState == GuardState.Investigate)
+        {
+            investigateTarget = noisePos;
+            currentState = GuardState.Investigate;
+            stateTimer = 0f;
+        }
     }
 
-    public void HearNoise(Vector3 position)
+    void OnDrawGizmosSelected()
     {
-        if (currentState == GuardState.Chase) return;
-
-        lastKnownPosition = position;
-        hasTarget = true;
-        searchWaitTimer = 0f;
-        currentState = GuardState.Search;
-        SetDestination(position);
-    }
-
-    public void ReturnToPatrol()
-    {
-        currentState = GuardState.Patrol;
-        patrolDirection = 1;
-        hasTarget = false;
-        waitTimer = 0f;
-        noSightTimer = 0f;
-        searchWaitTimer = 0f;
-        playerWasVisible = false;
-        agent.stoppingDistance = patrolStoppingDistance;
-        smoothMoveDir = Vector2.zero;
-        if (waypoints != null && waypoints.Length > 0)
-            SetDestination(waypoints[CurrentWaypointIndex].position);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, visionRange);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, hearingRange);
     }
 }

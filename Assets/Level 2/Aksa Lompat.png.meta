@@ -72,7 +72,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 724
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -137,12 +137,12 @@ TextureImporter:
       name: aksa_jump_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 242
-        height: 724
+        x: 78
+        y: 89
+        width: 243
+        height: 432
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -159,34 +159,12 @@ TextureImporter:
       name: aksa_jump_1
       rect:
         serializedVersion: 2
-        x: 242
-        y: 0
-        width: 242
-        height: 724
+        x: 470
+        y: 89
+        width: 244
+        height: 530
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: cec7b66c5650847d0800000000000000
-      internalID: -2934089222553109268
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: aksa_jump_2
-      rect:
-        serializedVersion: 2
-        x: 484
-        y: 0
-        width: 242
-        height: 724
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -200,37 +178,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: aksa_jump_3
+      name: aksa_jump_2
       rect:
         serializedVersion: 2
-        x: 726
-        y: 0
-        width: 242
-        height: 724
+        x: 852
+        y: 89
+        width: 281
+        height: 591
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 88e5bf62c14bed0b0800000000000000
-      internalID: -5701922045198377336
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: aksa_jump_4
-      rect:
-        serializedVersion: 2
-        x: 968
-        y: 0
-        width: 242
-        height: 724
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -244,15 +200,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: aksa_jump_5
+      name: aksa_idle_0
       rect:
         serializedVersion: 2
-        x: 1210
-        y: 0
-        width: 242
-        height: 724
+        x: 1646
+        y: 92
+        width: 228
+        height: 461
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -266,37 +222,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: aksa_jump_6
+      name: aksa_jump_3
       rect:
         serializedVersion: 2
-        x: 1452
-        y: 0
+        x: 1263
+        y: 92
         width: 242
-        height: 724
+        height: 485
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 0824942ef9046fa50800000000000000
-      internalID: 6554497363124765312
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: aksa_jump_7
-      rect:
-        serializedVersion: 2
-        x: 1694
-        y: 0
-        width: 242
-        height: 724
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -313,7 +247,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c77444ce0718a1b45951cbb9c932b5ce
     internalID: 0
     vertices: []
     indices: 
@@ -323,6 +257,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
+      Aksa Lompat_0: 2068265250
+      aksa_idle_0: 5546881006543099938
       aksa_jump_0: -1404543590754307946
       aksa_jump_0_0: 7683496812453715222
       aksa_jump_0_1: 5420534859744487388
@@ -332,7 +268,7 @@ TextureImporter:
       aksa_jump_0_5: 8600032777033135586
       aksa_jump_0_6: -3100963036367129920
       aksa_jump_0_7: -5815415580888903412
-      aksa_jump_1: -2934089222553109268
+      aksa_jump_1: -6477660521001629529
       aksa_jump_1_0: -6995696136764224071
       aksa_jump_1_1: -1259133940311300938
       aksa_jump_1_2: -694892456698326578
@@ -341,12 +277,9 @@ TextureImporter:
       aksa_jump_1_5: -4457674112096204870
       aksa_jump_1_6: 5445338595447986658
       aksa_jump_1_7: 4177640995597198024
-      aksa_jump_2: -6477660521001629529
-      aksa_jump_3: -5701922045198377336
-      aksa_jump_4: 3028489032471517160
-      aksa_jump_5: 5546881006543099938
+      aksa_jump_2: 3028489032471517160
+      aksa_jump_3: -7974325043138547292
       aksa_jump_6: 6554497363124765312
-      aksa_jump_7: -7974325043138547292
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
