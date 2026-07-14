@@ -137,7 +137,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 3.6, y: 4.15}
+  m_Size: {x: 2.79, y: 1.82}
   m_EdgeRadius: 0
 --- !u!114 &3941309733408455245
 MonoBehaviour:
@@ -151,4 +151,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03d45ede87e6fed4ca78105e9a916351, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  restartMessage: Kena rintangan!
+  restartMessage: Kamu tertangkap geng Aldi!

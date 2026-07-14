@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -15,7 +16,7 @@ public class DialogEntry
     [TextArea(2, 5)] public string text;
 }
 
-public class OpeningDialogManager : MonoBehaviour, IPointerClickHandler
+public class OpeningDialogManager : MonoBehaviour
 {
     [Header("Panel References")]
     [SerializeField] private AudioSource phoneAudioSource;
@@ -39,12 +40,37 @@ public class OpeningDialogManager : MonoBehaviour, IPointerClickHandler
     [SerializeField] private float listenerScale = 0.85f;
     [SerializeField, Range(0f, 1f)] private float listenerDimValue = 0.4f;
 
+    [Header("Camera Transition")]
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Graphic blackOverlay;
+    [SerializeField] private float cameraFadeDuration = 0.5f;
+    [SerializeField] private Vector3 hallwayCameraPosition = new Vector3(0, 1, -10);
+    [SerializeField] private Vector3 kelasCameraPosition = new Vector3(18.41f, 0.97f, -10);
+
     private int currentEntryIndex = 0;
     private bool isDialogActive = false;
-    private Coroutine fadeCoroutine;
+    private bool hasTransitioned = false;
 
     private void Start()
     {
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        if (mainCamera != null)
+            mainCamera.transform.position = hallwayCameraPosition;
+
+        if (blackOverlay != null)
+        {
+            var fc = blackOverlay.transform.parent;
+            if (fc != null)
+                DontDestroyOnLoad(fc.gameObject);
+
+            var c = blackOverlay.color;
+            c.a = 0f;
+            blackOverlay.color = c;
+            blackOverlay.raycastTarget = true;
+        }
+
         if (dialogRootGroup != null)
         {
             dialogRootGroup.alpha = 0f;
@@ -60,21 +86,62 @@ public class OpeningDialogManager : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void Update()
     {
-        if (!isDialogActive)
-            StartCoroutine(StartDialogSequence());
-        else
+        if (!hasTransitioned && Input.GetMouseButtonDown(0))
+            StartCoroutine(CameraTransitionThenDialog());
+        else if (isDialogActive && dialogRootGroup != null && dialogRootGroup.blocksRaycasts && Input.GetMouseButtonDown(0))
             ShowNextEntry();
     }
 
-    private IEnumerator StartDialogSequence()
+    private IEnumerator CameraTransitionThenDialog()
     {
-        isDialogActive = true;
+        hasTransitioned = true;
 
         if (phoneAudioSource != null)
             phoneAudioSource.Stop();
 
+        if (blackOverlay != null)
+        {
+            float elapsed = 0f;
+            while (elapsed < cameraFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Lerp(0f, 1f, elapsed / cameraFadeDuration);
+                var c = blackOverlay.color;
+                c.a = t;
+                blackOverlay.color = c;
+                yield return null;
+            }
+            var c2 = blackOverlay.color;
+            c2.a = 1f;
+            blackOverlay.color = c2;
+        }
+
+        if (mainCamera != null)
+            mainCamera.transform.position = kelasCameraPosition;
+
+        yield return new WaitForSeconds(0.1f);
+
+        if (blackOverlay != null)
+        {
+            float elapsed = 0f;
+            while (elapsed < cameraFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Lerp(1f, 0f, elapsed / cameraFadeDuration);
+                var c = blackOverlay.color;
+                c.a = t;
+                blackOverlay.color = c;
+                yield return null;
+            }
+            var c2 = blackOverlay.color;
+            c2.a = 0f;
+            blackOverlay.color = c2;
+            blackOverlay.raycastTarget = false;
+        }
+
+        isDialogActive = true;
         if (dialogRootGroup != null)
         {
             float elapsed = 0f;
@@ -98,11 +165,37 @@ public class OpeningDialogManager : MonoBehaviour, IPointerClickHandler
         currentEntryIndex++;
         if (currentEntryIndex >= dialogEntries.Count)
         {
-            onDialogFinished?.Invoke();
+            isDialogActive = false;
+            StartCoroutine(FadeAndLoadScene());
             return;
         }
 
         ShowEntry(currentEntryIndex);
+    }
+
+    private IEnumerator FadeAndLoadScene()
+    {
+        if (blackOverlay != null)
+        {
+            blackOverlay.raycastTarget = true;
+            float elapsed = 0f;
+            while (elapsed < cameraFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Lerp(0f, 1f, elapsed / cameraFadeDuration);
+                var c = blackOverlay.color;
+                c.a = t;
+                blackOverlay.color = c;
+                yield return null;
+            }
+            var c2 = blackOverlay.color;
+            c2.a = 1f;
+            blackOverlay.color = c2;
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        SceneManager.LoadScene("level2_platformer");
     }
 
     private void ShowEntry(int index)
@@ -134,5 +227,51 @@ public class OpeningDialogManager : MonoBehaviour, IPointerClickHandler
 
         characterImage.transform.localScale = Vector3.one * targetScale;
         characterImage.color = targetColor;
+    }
+}
+
+public class SceneFadeHandler : MonoBehaviour
+{
+    [SerializeField] private float fadeDuration = 0.5f;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        var rawImg = GetComponentInChildren<UnityEngine.UI.RawImage>();
+        if (rawImg == null) return;
+
+        var c = rawImg.color;
+        c.a = 1f;
+        rawImg.color = c;
+        rawImg.raycastTarget = true;
+
+        StartCoroutine(FadeIn(rawImg));
+    }
+
+    private System.Collections.IEnumerator FadeIn(UnityEngine.UI.RawImage rawImg)
+    {
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
+            var c = rawImg.color;
+            c.a = t;
+            rawImg.color = c;
+            yield return null;
+        }
+        var c2 = rawImg.color;
+        c2.a = 0f;
+        rawImg.color = c2;
+        rawImg.raycastTarget = false;
     }
 }

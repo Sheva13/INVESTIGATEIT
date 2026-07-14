@@ -16,6 +16,7 @@ public class ObjectiveManager : MonoBehaviour
     [SerializeField] private bool isFramePhotoTaken;
     [SerializeField] private bool isBookPhotoTaken;
     [SerializeField] private bool isLaptopPhotoTaken;
+    [SerializeField] private bool isPetaPhotoTaken;
 
     private static ObjectiveManager _instance;
     public static ObjectiveManager Instance
@@ -50,14 +51,15 @@ public class ObjectiveManager : MonoBehaviour
             case "frame":  isFramePhotoTaken = true;  break;
             case "book":   isBookPhotoTaken = true;   break;
             case "laptop": isLaptopPhotoTaken = true;  break;
+            case "peta":   isPetaPhotoTaken = true;    break;
             default:
                 Debug.LogWarning("Unknown photo id: " + id);
                 return;
         }
 
-        Debug.Log($"Foto {id} tercatat! Frame:{isFramePhotoTaken} Book:{isBookPhotoTaken} Laptop:{isLaptopPhotoTaken}");
+        Debug.Log($"Foto {id} tercatat! Frame:{isFramePhotoTaken} Book:{isBookPhotoTaken} Laptop:{isLaptopPhotoTaken} Peta:{isPetaPhotoTaken}");
 
-        if (isFramePhotoTaken && isBookPhotoTaken && isLaptopPhotoTaken)
+        if (isFramePhotoTaken && isBookPhotoTaken && isLaptopPhotoTaken && isPetaPhotoTaken)
         {
             Debug.Log("Semua foto terkumpul! Pindah scene...");
             StartCoroutine(FadeAndLoad());

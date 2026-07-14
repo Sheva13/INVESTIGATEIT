@@ -15,12 +15,14 @@ public class FlyingChair : MonoBehaviour
             Destroy(gameObject);
     }
 
+    public string restartMessage = "Kena kursi terbang!";
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             var gm = FindAnyObjectByType<GameManager>();
-            if (gm != null) gm.RestartLevel();
+            if (gm != null) gm.PlayerHitObstacle(transform.position, restartMessage);
         }
     }
 }

@@ -9,9 +9,7 @@ namespace Level2
     [Header("UI")]
     public GameObject winUI;
     public GameObject loseUI;
-
-    [Header("Popup")]
-    public GameObject popupTextPrefab;
+    public TextMeshProUGUI restartMessageText;
 
     [Header("Audio")]
     public AudioSource sfxAudioSource;
@@ -20,14 +18,17 @@ namespace Level2
     [Header("Settings")]
     public float restartDelay = 1f;
 
+    void Start()
+    {
+        if (restartMessageText) restartMessageText.gameObject.SetActive(false);
+    }
+
     public void PlayerHitObstacle(Vector3 position, string message)
     {
-        if (popupTextPrefab)
+        if (restartMessageText)
         {
-            var popup = Instantiate(popupTextPrefab, position + Vector3.up * 2f, Quaternion.identity);
-            var tmp = popup.GetComponentInChildren<TextMeshPro>();
-            if (tmp) tmp.text = message;
-            Destroy(popup, restartDelay);
+            restartMessageText.text = message;
+            restartMessageText.gameObject.SetActive(true);
         }
 
         if (sfxAudioSource && oofClip)
