@@ -50,6 +50,7 @@ public class OpeningDialogManager : MonoBehaviour
 
     [Header("Scene Transition")]
     [SerializeField] private LevelToKotaTransition levelToKotaTransition;
+    [SerializeField] private string nextSceneName = "SampleScene";
 
     private int currentEntryIndex = 0;
     private bool isDialogActive = false;
@@ -208,7 +209,7 @@ public class OpeningDialogManager : MonoBehaviour
         if (levelToKotaTransition != null)
             levelToKotaTransition.LoadKota();
         else
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene(nextSceneName);
     }
 
     private void ShowEntry(int index)
