@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Obstacle
+  - ZoneBarrier
+  - Warehouse
+  - Ground
+  - Guard
+  - Winzone
+  - Kaleng
   layers:
   - Default
   - TransparentFX
@@ -16,7 +23,7 @@ TagManager:
   - Player
   - Enemy
   - Obstacle
-  - 
+  - Ground
   - 
   - 
   - 

@@ -52,10 +52,8 @@ public class ThrowableObject : MonoBehaviour
         totalDist = Vector2.Distance(startPosition, target);
         expectedDuration = throwSpeed > 0f ? totalDist / throwSpeed : 1f;
         elapsedFlightTime = 0f;
-
         isThrown = true;
-        
-        Debug.Log($"ThrowableObject.Throw: clip={(throwClip != null ? throwClip.name : "NULL")}");
+
         if (throwClip != null)
             AudioSource.PlayClipAtPoint(throwClip, Camera.main.transform.position, 0.8f);
     }

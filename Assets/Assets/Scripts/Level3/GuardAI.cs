@@ -1,71 +1,65 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class GuardAI : MonoBehaviour
 {
-    [Header("Patrol")]
+    [Header("Movement")]
     public Transform[] waypoints;
-    public float patrolSpeed = 1.2f;
-    public float chaseSpeed = 2.5f;
-    public float waypointWaitTime = 1f;
+    public float patrolSpeed = 1.8f;
+    public float chaseSpeed = 3.2f;
+    public float investigateSpeed = 2.2f;
+    public float patrolAccel = 8f;
+    public float chaseAccel = 12f;
+    public float arrivalThreshold = 0.2f;
 
     [Header("Detection")]
-    public float hearingRange = 6f;
-    public float sightRange = 10f;
+    public float sightRange = 3.5f;
     [Range(0, 360)]
-    public float sightAngle = 100f;
+    public float sightAngle = 60f;
     public LayerMask obstacleMask;
+
+    [Header("Timing")]
+    public float waypointWaitTime = 1f;
+    public float investigateDuration = 3f;
+    public float chaseUpdateInterval = 0.3f;
+    public float noSightTimeout = 2f;
+
+    [Header("Capture")]
+    public float captureDistance = 0.8f;
 
     [Header("Footstep Audio")]
     public AudioClip[] footstepClips;
-    public float footstepInterval = 0.6f;
+    public float footstepInterval = 0.5f;
     public float footstepVolume = 0.8f;
 
     [Header("State")]
+    public Vector2 AnimMoveDir => animMoveDir;
     public GuardState currentState = GuardState.Patrol;
 
     public int PreviousWaypointIndex { get; private set; }
     public int CurrentWaypointIndex { get; private set; }
 
-    private NavMeshAgent agent;
-    private Rigidbody2D rb;
     private Animator animator;
     private AudioSource audioSource;
+    private Transform playerTransform;
     private Vector2 animMoveDir;
-    private Vector2 smoothMoveDir;
+    private Vector2 currentVelocity;
     private float waitTimer;
     private float footstepTimer;
     private float chaseUpdateTimer;
-    private int patrolDirection = 1;
-    private Vector3 lastKnownPosition;
-    private Vector3 chaseTargetPosition;
-    private bool hasTarget;
-    private bool playerWasVisible;
     private float noSightTimer;
-    private float searchWaitTimer;
+    private float investigateTimer;
+    private int patrolDirection = 1;
+    private bool hasTarget;
     private static int closestGuardFrame = -1;
     private static GuardAI closestGuardCache;
-    private const float movementSmoothSpeed = 6f;
-    private const float chaseStoppingDistance = 1.2f;
-    private const float patrolStoppingDistance = 0.1f;
-    private const float chaseUpdateInterval = 0.3f;
-    private const float chaseUpdateDistThreshold = 2f;
-    private const float captureDistance = 0.8f;
+    private GameManager gmCache;
+    private Vector3 lastKnownPosition;
 
     void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        if (agent == null)
-            agent = gameObject.AddComponent<NavMeshAgent>();
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.simulated = false;
 
-        agent.updatePosition = false;
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
-        agent.stoppingDistance = patrolStoppingDistance;
-        agent.acceleration = 6f;
-        agent.obstacleAvoidanceType = ObstacleAvoidanceType.High;
-
-        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         if (audioSource != null)
@@ -77,79 +71,45 @@ public class GuardAI : MonoBehaviour
 
         if (waypoints == null || waypoints.Length == 0)
             FindWaypoints();
-        closestGuardFrame = -1;
-        closestGuardCache = null;
     }
 
     void Start()
     {
-        if (agent != null)
-        {
-            agent.updatePosition = false;
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
-        }
+        GameObject playerGo = GameObject.FindGameObjectWithTag("Player");
+        if (playerGo != null)
+            playerTransform = playerGo.transform;
 
-        if (waypoints != null && waypoints.Length > 0 && waypoints[0] != null)
-        {
-            transform.position = new Vector3(waypoints[0].position.x, waypoints[0].position.y, transform.position.z);
-        }
-
-        if (agent != null && agent.isActiveAndEnabled)
-        {
-            Vector3 originalPos = transform.position;
-            agent.Warp(new Vector3(originalPos.x, 0f, originalPos.y));
-            transform.position = originalPos;
-            SetDestination(waypoints[0].position);
-        }
+        gmCache = FindAnyObjectByType<GameManager>();
+        closestGuardFrame = -1;
+        closestGuardCache = null;
     }
 
     void FixedUpdate()
     {
-        if (agent == null || !agent.isOnNavMesh) return;
-
         if (currentState == GuardState.Trapped)
         {
-            if (rb != null)
-                rb.linearVelocity = Vector2.zero;
+            currentVelocity = Vector2.zero;
             return;
         }
 
-        agent.nextPosition = new Vector3(transform.position.x, 0f, transform.position.y);
+        Vector2 targetPos = GetTargetPosition();
+        Vector2 guardPos = transform.position;
+        Vector2 dir = targetPos - guardPos;
 
-        Vector2 rawDir = new Vector2(agent.desiredVelocity.x, agent.desiredVelocity.z);
+        float currentSpeed = GetCurrentSpeed();
+        bool shouldMove = dir.magnitude > arrivalThreshold;
 
-        if (rawDir.sqrMagnitude < 0.01f && agent.hasPath)
-        {
-            Vector3 target3D = agent.destination;
-            rawDir = new Vector2(target3D.x - transform.position.x, target3D.z - transform.position.y);
-        }
+        currentVelocity = shouldMove ? dir.normalized * currentSpeed : Vector2.zero;
 
-        rawDir = rawDir.normalized;
+        Vector2 newPos = Vector2.MoveTowards(guardPos, targetPos, currentSpeed * Time.fixedDeltaTime);
+        transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
 
-        smoothMoveDir = Vector2.MoveTowards(smoothMoveDir, rawDir, movementSmoothSpeed * Time.fixedDeltaTime);
-        animMoveDir = smoothMoveDir;
-        float currentSpeed = (currentState == GuardState.Chase) ? chaseSpeed : patrolSpeed;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = smoothMoveDir * currentSpeed;
-        }
+        if (currentVelocity.sqrMagnitude > 0.01f)
+            animMoveDir = currentVelocity.normalized;
     }
 
     void Update()
     {
-        if (agent == null || !agent.isOnNavMesh) return;
-
-        if (currentState == GuardState.Trapped)
-        {
-            if (rb != null)
-                rb.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        CheckForPlayer();
-
         switch (currentState)
         {
             case GuardState.Patrol:
@@ -164,62 +124,35 @@ public class GuardAI : MonoBehaviour
                 break;
         }
 
-        if (animator != null)
-        {
-            float speed = rb != null ? rb.linearVelocity.magnitude : 0f;
-            animator.SetFloat("Speed", speed);
-            if (speed > 0.1f)
-            {
-                animator.SetFloat("MoveX", animMoveDir.x);
-                animator.SetFloat("MoveY", animMoveDir.y);
-            }
-        }
-
+        UpdateAnimator();
         UpdateFootstep();
     }
 
-    void CheckForPlayer()
+    Vector2 GetTargetPosition()
     {
-        GameManager gm = FindAnyObjectByType<GameManager>();
-        if (gm == null || gm.player == null) return;
-
-        Vector2 guardPos = transform.position;
-        Vector2 playerPos = gm.player.transform.position;
-        Vector2 dirToPlayer = playerPos - guardPos;
-        float distToPlayer = dirToPlayer.magnitude;
-
-        if (distToPlayer > sightRange) return;
-
-        bool inCone = false;
-        if (currentState == GuardState.Search)
+        switch (currentState)
         {
-            inCone = true;
+            case GuardState.Patrol:
+            case GuardState.Return:
+                if (waypoints != null && waypoints.Length > 0)
+                    return waypoints[CurrentWaypointIndex].position;
+                return transform.position;
+            case GuardState.Chase:
+                return playerTransform != null ? playerTransform.position : transform.position;
+            case GuardState.Search:
+                return hasTarget ? new Vector2(lastKnownPosition.x, lastKnownPosition.y) : transform.position;
+            default:
+                return transform.position;
         }
-        else if (smoothMoveDir.sqrMagnitude > 0.01f)
+    }
+
+    float GetCurrentSpeed()
+    {
+        switch (currentState)
         {
-            float dot = Vector2.Dot(smoothMoveDir.normalized, dirToPlayer.normalized);
-            float coneThreshold = Mathf.Cos(sightAngle * 0.5f * Mathf.Deg2Rad);
-            inCone = dot >= coneThreshold;
-        }
-        else
-        {
-            inCone = distToPlayer <= 4f;
-        }
-
-        if (!inCone) return;
-
-        RaycastHit2D hit = Physics2D.Raycast(guardPos, dirToPlayer.normalized, distToPlayer, obstacleMask);
-        if (hit.collider != null) return;
-
-        lastKnownPosition = playerPos;
-        hasTarget = true;
-
-        if (currentState != GuardState.Chase)
-        {
-            currentState = GuardState.Chase;
-            agent.stoppingDistance = chaseStoppingDistance;
-            chaseTargetPosition = playerPos;
-            chaseUpdateTimer = 0f;
+            case GuardState.Chase: return chaseSpeed;
+            case GuardState.Search: return investigateSpeed;
+            default: return patrolSpeed;
         }
     }
 
@@ -229,9 +162,7 @@ public class GuardAI : MonoBehaviour
 
         Transform wpParent = null;
         if (transform.parent != null)
-        {
             wpParent = transform.parent.Find(wpName);
-        }
 
         if (wpParent == null)
         {
@@ -251,9 +182,9 @@ public class GuardAI : MonoBehaviour
     {
         if (waypoints == null || waypoints.Length == 0) return;
 
-        agent.speed = patrolSpeed;
+        float distToTarget = Vector2.Distance(transform.position, waypoints[CurrentWaypointIndex].position);
 
-        if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance)
+        if (distToTarget < arrivalThreshold)
         {
             waitTimer += Time.deltaTime;
             if (waitTimer >= waypointWaitTime)
@@ -269,88 +200,56 @@ public class GuardAI : MonoBehaviour
                 }
 
                 CurrentWaypointIndex = nextIndex;
-                SetDestination(waypoints[CurrentWaypointIndex].position);
             }
         }
     }
 
     void UpdateChase()
     {
-        agent.speed = chaseSpeed;
+        if (playerTransform == null) return;
 
-        if (!hasTarget) return;
+        Vector2 playerPos = playerTransform.position;
+        Vector2 guardPos = transform.position;
+        float dist = Vector2.Distance(guardPos, playerPos);
 
-        GameManager gm = FindAnyObjectByType<GameManager>();
-        if (gm != null && gm.player != null)
+        if (dist <= captureDistance)
         {
-            Vector2 playerPos = gm.player.transform.position;
-            Vector2 guardPos = transform.position;
-            Vector2 dirToPlayer = playerPos - guardPos;
-            float dist = dirToPlayer.magnitude;
+            if (gmCache != null) gmCache.LoseGame();
+            return;
+        }
 
-            if (dist <= captureDistance)
-            {
-                gm.LoseGame();
-                return;
-            }
+        if (dist > sightRange)
+        {
+            noSightTimer += Time.deltaTime;
+        }
+        else
+        {
+            noSightTimer = 0f;
+        }
 
-            bool stillVisible = dist <= sightRange;
-            if (stillVisible)
-            {
-                Vector2 lookDir = (smoothMoveDir.sqrMagnitude > 0.01f) ? smoothMoveDir.normalized : dirToPlayer.normalized;
-                float dot = Vector2.Dot(lookDir, dirToPlayer.normalized);
-                float coneThreshold = Mathf.Cos(sightAngle * 0.5f * Mathf.Deg2Rad);
-                if (dot >= coneThreshold || smoothMoveDir.sqrMagnitude <= 0.01f)
-                {
-                    RaycastHit2D hit = Physics2D.Raycast(guardPos, dirToPlayer.normalized, dist, obstacleMask);
-                    if (hit.collider != null) stillVisible = false;
-                }
-                else
-                {
-                    stillVisible = false;
-                }
-            }
-
-            if (stillVisible)
-            {
-                lastKnownPosition = playerPos;
-                noSightTimer = 0f;
-            }
-            else
-            {
-                noSightTimer += Time.deltaTime;
-            }
-
-            if (noSightTimer >= 2f)
-            {
-                currentState = GuardState.Search;
-                return;
-            }
+        if (noSightTimer >= noSightTimeout)
+        {
+            currentState = GuardState.Search;
+            hasTarget = true;
+            investigateTimer = 0f;
+            return;
         }
 
         chaseUpdateTimer += Time.deltaTime;
-        float distToTarget = Vector2.Distance(transform.position, chaseTargetPosition);
-        if (chaseUpdateTimer >= chaseUpdateInterval || distToTarget > chaseUpdateDistThreshold)
+        if (chaseUpdateTimer >= chaseUpdateInterval)
         {
-            chaseTargetPosition = lastKnownPosition;
-            SetDestination(lastKnownPosition);
             chaseUpdateTimer = 0f;
-        }
-
-        if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance)
-        {
-            currentState = GuardState.Search;
         }
     }
 
     void UpdateSearch()
     {
-        CheckForPlayer();
+        float distToTarget = Vector2.Distance(transform.position, new Vector2(lastKnownPosition.x, lastKnownPosition.y));
 
-        if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance)
+        if (distToTarget < arrivalThreshold)
         {
-            searchWaitTimer += Time.deltaTime;
-            if (searchWaitTimer >= 1.5f)
+            investigateTimer += Time.deltaTime;
+            if (investigateTimer >= investigateDuration)
             {
                 ReturnToPatrol();
             }
@@ -362,9 +261,8 @@ public class GuardAI : MonoBehaviour
         if (footstepClips == null || footstepClips.Length == 0) return;
         if (audioSource == null) return;
 
-        float currentSpeed = (currentState == GuardState.Chase) ? chaseSpeed : patrolSpeed;
-        float effectiveSpeed = smoothMoveDir.magnitude * currentSpeed;
-        if (effectiveSpeed <= 0.01f) return;
+        float spd = currentVelocity.magnitude;
+        if (spd <= 0.01f) return;
         if (currentState == GuardState.Chase) return;
 
         if (!IsClosestGuardToPlayerCached()) return;
@@ -377,14 +275,27 @@ public class GuardAI : MonoBehaviour
         }
     }
 
+    void UpdateAnimator()
+    {
+        if (animator == null) return;
+
+        float speed = currentVelocity.magnitude;
+        animator.SetFloat("Speed", speed);
+
+        if (speed > 0.1f)
+        {
+            animator.SetFloat("MoveX", animMoveDir.x);
+            animator.SetFloat("MoveY", animMoveDir.y);
+        }
+    }
+
     bool IsClosestGuardToPlayerCached()
     {
         int currentFrame = Time.frameCount;
         if (currentFrame != closestGuardFrame)
         {
             closestGuardFrame = currentFrame;
-            GameManager gm = FindAnyObjectByType<GameManager>();
-            if (gm == null || gm.player == null)
+            if (playerTransform == null)
             {
                 closestGuardCache = null;
                 return false;
@@ -392,13 +303,12 @@ public class GuardAI : MonoBehaviour
 
             GuardAI best = null;
             float bestDist = float.MaxValue;
-            Vector2 playerPos = gm.player.transform.position;
 
-            var guards = FindObjectsByType<GuardAI>(FindObjectsSortMode.None);
+            var guards = FindObjectsByType<GuardAI>();
             foreach (var guard in guards)
             {
                 if (guard == null) continue;
-                float d = Vector2.Distance(guard.transform.position, playerPos);
+                float d = Vector2.Distance(guard.transform.position, playerTransform.position);
                 if (d < bestDist)
                 {
                     bestDist = d;
@@ -420,21 +330,14 @@ public class GuardAI : MonoBehaviour
         audioSource.PlayOneShot(clip);
     }
 
-    void SetDestination(Vector3 position)
-    {
-        if (agent != null && agent.isOnNavMesh)
-            agent.SetDestination(new Vector3(position.x, 0f, position.y));
-    }
-
     public void HearNoise(Vector3 position)
     {
         if (currentState == GuardState.Chase) return;
 
         lastKnownPosition = position;
         hasTarget = true;
-        searchWaitTimer = 0f;
+        investigateTimer = 0f;
         currentState = GuardState.Search;
-        SetDestination(position);
     }
 
     public void ReturnToPatrol()
@@ -444,11 +347,16 @@ public class GuardAI : MonoBehaviour
         hasTarget = false;
         waitTimer = 0f;
         noSightTimer = 0f;
-        searchWaitTimer = 0f;
-        playerWasVisible = false;
-        agent.stoppingDistance = patrolStoppingDistance;
-        smoothMoveDir = Vector2.zero;
-        if (waypoints != null && waypoints.Length > 0)
-            SetDestination(waypoints[CurrentWaypointIndex].position);
+        investigateTimer = 0f;
+    }
+
+    public void OnPlayerDetected()
+    {
+        if (currentState == GuardState.Chase) return;
+
+        currentState = GuardState.Chase;
+        hasTarget = true;
+        chaseUpdateTimer = 0f;
+        noSightTimer = 0f;
     }
 }

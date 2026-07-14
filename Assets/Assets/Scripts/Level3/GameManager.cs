@@ -9,7 +9,6 @@ public class GameManager : MonoBehaviour
     public GameObject winUI;
     public GameObject loseUI;
     public Text canCountText;
-    public Text notificationText;
 
     [Header("References")]
     public PlayerController player;
@@ -33,7 +32,6 @@ public class GameManager : MonoBehaviour
     [Header("Gameplay State")]
     public bool hasLoot = false;
 
-    private float notifTimer = 0f;
     private bool isGameOver = false;
 
     void Awake()
@@ -45,8 +43,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        if (notificationText != null)
-            notificationText.gameObject.SetActive(false);
         if (fadeOverlay != null)
         {
             Color c = fadeOverlay.color;
@@ -63,45 +59,20 @@ public class GameManager : MonoBehaviour
             canCountText.text = $"{player.GetThrowableCount()}";
         }
 
-        if (notifTimer > 0f)
-        {
-            notifTimer -= Time.deltaTime;
-            if (notifTimer <= 0f && notificationText != null)
-                notificationText.gameObject.SetActive(false);
-        }
-
         if (Input.GetKeyDown(KeyCode.R))
             RestartLevel();
     }
 
     public void ShowNotification(string message, Color color, float duration = 3f)
     {
-        if (notificationText == null) return;
-        if (string.IsNullOrEmpty(message))
-        {
-            notificationText.gameObject.SetActive(false);
-            return;
-        }
-        notificationText.text = message;
-        notificationText.color = color;
-        notificationText.gameObject.SetActive(true);
-        notifTimer = duration;
-    }
-
-    public void HideNotification()
-    {
-        if (notificationText != null)
-            notificationText.gameObject.SetActive(false);
     }
 
     public void RegisterTrapTriggered(string areaName)
     {
         trapsTriggered++;
-        ShowNotification($"Area {areaName} berhasil dijebak! ({trapsTriggered}/{totalTraps})", Color.green, 3f);
 
         if (trapsTriggered >= totalTraps)
         {
-            ShowNotification("Semua area aman! Mencari kemenangan...", Color.yellow, 2f);
             Invoke(nameof(WinGame), 2f);
         }
     }
@@ -128,7 +99,6 @@ public class GameManager : MonoBehaviour
 
         HideGameUI();
 
-        ShowNotification("Aksa tertangkap!", Color.red, 99f);
         if (loseUI) loseUI.SetActive(true);
         if (loseClip != null)
             AudioSource.PlayClipAtPoint(loseClip, Camera.main.transform.position, 1f);
@@ -140,7 +110,6 @@ public class GameManager : MonoBehaviour
         if (objektifText) objektifText.SetActive(false);
         if (canIcon) canIcon.SetActive(false);
         if (kalengCounter) kalengCounter.SetActive(false);
-        if (notificationText) notificationText.gameObject.SetActive(false);
         if (canCountText) canCountText.gameObject.SetActive(false);
     }
 
