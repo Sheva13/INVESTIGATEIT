@@ -9356,7 +9356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5093685c5435ec2469576c90c6b9863c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelEntryTrigger
-  sceneToLoad: SampleScene
+  sceneToLoad: level1_rumahwicak
   promptCanvas: {fileID: 976164208}
 --- !u!1 &928684153
 GameObject:
@@ -13429,11 +13429,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController2
   moveSpeed: 2.5
   acceleration: 12
-  sprintMultiplier: 2
   maxThrowables: 3
   throwRange: 20
+  throwMaxHeight: 3
   throwablePrefab: {fileID: 0}
   throwSpawnPoint: {fileID: 0}
+  skillCircleRadius: 5
+  skillCircleWidth: 0.08
+  skillCircleSegments: 60
+  skillCircleColor: {r: 0, g: 1, b: 1, a: 0.3}
+  skillMarkerColor: {r: 1, g: 1, b: 0, a: 0.8}
+  skillMarkerSize: 0.5
   audioSource: {fileID: 0}
   footstepClips:
   - {fileID: 8300000, guid: 4d11813f5983ce047873c94858e6a6c1, type: 3}
