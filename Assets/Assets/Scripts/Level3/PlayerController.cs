@@ -139,12 +139,22 @@ public class PlayerController : MonoBehaviour
         }
 
         if (animator != null)
+        {
             animator.SetFloat("Speed", speed);
+            if (speed > 0.1f)
+            {
+                animator.SetFloat("MoveX", facingDir.x);
+                animator.SetFloat("MoveY", facingDir.y);
+            }
+        }
 
-        if (moveInput.x < 0)
-            sprite.flipX = true;
-        else if (moveInput.x > 0)
-            sprite.flipX = false;
+        if (isPlatformer)
+        {
+            if (moveInput.x < 0)
+                sprite.flipX = true;
+            else if (moveInput.x > 0)
+                sprite.flipX = false;
+        }
 
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
