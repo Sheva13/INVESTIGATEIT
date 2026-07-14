@@ -51,9 +51,9 @@ public class TrapTrigger : Interactable
             float dist = Vector2.Distance(transform.position, guard.transform.position);
             if (dist <= trapRadius)
             {
-                var gt = guard.GetComponent<GUARD_TRAPPED>();
-                if (gt == null) gt = guard.gameObject.AddComponent<GUARD_TRAPPED>();
-                gt.SetTrapped(true);
+                guard.enabled = false;
+                var rb = guard.GetComponent<Rigidbody2D>();
+                if (rb != null) rb.linearVelocity = Vector2.zero;
                 trapped++;
             }
         }
