@@ -21,6 +21,15 @@ public class LaptopController : MonoBehaviour
         });
     }
 
+    void Update()
+    {
+        if (desktopScreen != null && desktopScreen.activeSelf
+            && Input.GetKeyDown(KeyCode.C) && !CameraManager.Instance.IsActive)
+        {
+            CaptureScreen();
+        }
+    }
+
     public void PowerOn()
     {
         laptopOff.SetActive(false);
