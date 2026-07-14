@@ -5,7 +5,7 @@ public class PlayerController2 : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 2.5f;
     public float acceleration = 12f;
-    public float sprintMultiplier = 10f;
+    public float sprintMultiplier = 2f;
 
 
     [Header("Throw")]
