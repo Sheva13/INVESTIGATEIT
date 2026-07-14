@@ -12,13 +12,22 @@ public class LaptopController : MonoBehaviour
 
     public TMP_InputField passwordInput;
 
-    public string correctPassword = "160406";
+    public string correctPassword = "160405";
 
     void Start()
     {
         passwordInput.onSubmit.AddListener(delegate {
             CheckPassword();
         });
+    }
+
+    void Update()
+    {
+        if (desktopScreen != null && desktopScreen.activeSelf
+            && Input.GetKeyDown(KeyCode.C) && !CameraManager.Instance.IsActive)
+        {
+            CaptureScreen();
+        }
     }
 
     public void PowerOn()

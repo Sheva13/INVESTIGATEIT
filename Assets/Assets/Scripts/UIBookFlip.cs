@@ -25,6 +25,10 @@ public class UIBookFlip : MonoBehaviour
     [SerializeField] private Button nextButton;
     [SerializeField] private Button closeButton;
 
+    [Header("World Object References")]
+    [SerializeField] private GameObject laptopWorld;
+    [SerializeField] private GameObject frameWorld;
+
     [Header("Animation Settings")]
     [SerializeField] private float flipDuration = 0.5f;
 
@@ -275,6 +279,20 @@ public class UIBookFlip : MonoBehaviour
                 closedBookObject.SetActive(false);
             }
         }
+
+        SetWorldColliders(false);
+    }
+
+    private void SetWorldColliders(bool enable)
+    {
+        foreach (var obj in new[] { laptopWorld, frameWorld })
+        {
+            if (obj != null)
+            {
+                var col = obj.GetComponent<Collider2D>();
+                if (col != null) col.enabled = enable;
+            }
+        }
     }
 
     public void KeepBookItem()
@@ -316,6 +334,7 @@ public class UIBookFlip : MonoBehaviour
         {
             closedBookObject.SetActive(true);
         }
+        SetWorldColliders(true);
     }
 
     private void HidePreviewPanel(bool animate = false)
@@ -614,6 +633,10 @@ public class UIBookFlip : MonoBehaviour
                 if (!isItemKept)
                 {
                     OnBookTriggered();
+                }
+                else
+                {
+                    SetWorldColliders(true);
                 }
             }
         }

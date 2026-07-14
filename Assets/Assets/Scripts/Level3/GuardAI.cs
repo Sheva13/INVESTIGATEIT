@@ -1,9 +1,20 @@
 using UnityEngine;
+using Level3;
+
+public enum GuardState
+{
+    Patrol,
+    Chase,
+    Search,
+    Trapped,
+    Return
+}
 
 public class GuardAI : MonoBehaviour
 {
     [Header("Movement")]
     public Transform[] waypoints;
+    public bool loopPatrol = false;
     public float patrolSpeed = 1.8f;
     public float chaseSpeed = 3.2f;
     public float investigateSpeed = 2.2f;
@@ -192,14 +203,20 @@ public class GuardAI : MonoBehaviour
                 waitTimer = 0f;
                 PreviousWaypointIndex = CurrentWaypointIndex;
 
-                int nextIndex = CurrentWaypointIndex + patrolDirection;
-                if (nextIndex >= waypoints.Length || nextIndex < 0)
+                if (loopPatrol)
                 {
-                    patrolDirection *= -1;
-                    nextIndex = CurrentWaypointIndex + patrolDirection;
+                    CurrentWaypointIndex = (CurrentWaypointIndex + 1) % waypoints.Length;
                 }
-
-                CurrentWaypointIndex = nextIndex;
+                else
+                {
+                    int nextIndex = CurrentWaypointIndex + patrolDirection;
+                    if (nextIndex >= waypoints.Length || nextIndex < 0)
+                    {
+                        patrolDirection *= -1;
+                        nextIndex = CurrentWaypointIndex + patrolDirection;
+                    }
+                    CurrentWaypointIndex = nextIndex;
+                }
             }
         }
     }

@@ -1,32 +1,40 @@
 using UnityEngine;
+using UnityEngine.EventSystems; // tambahkan ini
 
 public class LaptopHover : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private GameObject targetCanvas;  // Drag GameObject 'Canvas' ke sini
-    [SerializeField] private GameObject laptopPanel;   // Drag GameObject 'Panel' ke sini
-    [SerializeField] private GameObject laptopOutline; // Drag 'LaptopOutline' ke sini
+    [SerializeField] private GameObject targetCanvas;
+    [SerializeField] private GameObject laptopPanel;
+    [SerializeField] private GameObject laptopOutline;
+
+    [Header("World Object References")]
+    [SerializeField] private GameObject bookWorld;
+    [SerializeField] private GameObject frameWorld;
 
     private bool isPanelOpen = false;
 
     void Start()
     {
-        // 1. Matikan Canvas di awal game
-        if (targetCanvas != null) 
-        {
-            targetCanvas.SetActive(false);
-        }
-
-        // 2. Pastikan outline mati
+        if (targetCanvas != null) targetCanvas.SetActive(false);
         if (laptopOutline != null) laptopOutline.SetActive(false);
-        
         isPanelOpen = false;
+    }
+
+    void Update()
+    {
+        // Tutup panel dengan ESC
+        if (isPanelOpen && Input.GetKeyDown(KeyCode.Escape))
+        {
+            CloseLaptop();
+        }
     }
 
     void OnMouseEnter()
     {
-        // Tampilkan outline hanya jika panel belum terbuka
-        if (!isPanelOpen && laptopOutline != null && targetCanvas != null)
+        // Jangan tampilkan outline kalau panel sudah terbuka ATAU pointer sedang di atas UI
+        if (!isPanelOpen && !EventSystem.current.IsPointerOverGameObject() 
+            && laptopOutline != null && targetCanvas != null)
         {
             laptopOutline.SetActive(true);
         }
@@ -39,39 +47,47 @@ public class LaptopHover : MonoBehaviour
 
     void OnMouseDown()
     {
-        // Cegah kalau ada error null
+        if (isPanelOpen)
+        {
+            return;
+        }
+
         if (targetCanvas == null || laptopPanel == null)
         {
             Debug.LogError("Gagal: Slot Canvas atau Panel di Inspector masih kosong!");
             return;
         }
 
-        // Jangan buka lagi kalau sudah terbuka
-        if (!isPanelOpen)
+        if (laptopOutline != null) laptopOutline.SetActive(false);
+
+        targetCanvas.SetActive(true);
+        laptopPanel.SetActive(true);
+
+        Debug.Log("Canvas dan Panel berhasil dinyalakan!");
+        isPanelOpen = true;
+
+        SetWorldColliders(false);
+    }
+
+    private void SetWorldColliders(bool enable)
+    {
+        foreach (var obj in new[] { bookWorld, frameWorld })
         {
-            // Matikan outline
-            if (laptopOutline != null) laptopOutline.SetActive(false);
-
-            // 1. Nyalakan Canvas terlebih dahulu (WAJIB)
-            targetCanvas.SetActive(true);
-            
-            // 2. Baru nyalakan Panel spesifiknya
-            laptopPanel.SetActive(true);
-
-            Debug.Log("Canvas dan Panel berhasil dinyalakan!");
-            isPanelOpen = true;
+            if (obj != null)
+            {
+                var col = obj.GetComponent<Collider2D>();
+                if (col != null) col.enabled = enable;
+            }
         }
     }
 
-    // Fungsi untuk dipanggil saat user menutup laptop (Misal: klik tombol Close, atau sukses login)
     public void CloseLaptop()
     {
-        // Matikan panelnya dulu
         if (laptopPanel != null) laptopPanel.SetActive(false);
-        
-        // Opsional: kalau mau Canvasnya dimatikan total lagi, uncomment baris di bawah:
-        // if (targetCanvas != null) targetCanvas.SetActive(false);
+        if (targetCanvas != null) targetCanvas.SetActive(false);
 
-        isPanelOpen = false; // Kembalikan state agar bisa di-klik lagi
+        isPanelOpen = false;
+
+        SetWorldColliders(true);
     }
 }

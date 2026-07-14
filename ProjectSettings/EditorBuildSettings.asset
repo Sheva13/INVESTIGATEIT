@@ -20,5 +20,23 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/kota.unity
+    guid: f329331263f0ca940b4ce7a6f559b10a
+  - enabled: 1
+    path: Assets/Scenes/level2_platformer.unity
+    guid: 010efe6c547a8dd47a49593dc2f0e307
+  - enabled: 1
+    path: Assets/Scenes/level2_ruang.unity
+    guid: b782ce31cd433d046a629de9a55dbb33
+  - enabled: 1
+    path: Assets/Scenes/level2_kelas.unity
+    guid: 999ae5f8051459d48a0a36da26cf6d33
+  - enabled: 1
+    path: Assets/Scenes/level1_opening.unity
+    guid: ce39f748292334948aff3464b55011b9
+  - enabled: 1
+    path: Assets/Scenes/level1_rumahwicak.unity
+    guid: 461ab6f472e88d14881e36c16f620bbf
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
