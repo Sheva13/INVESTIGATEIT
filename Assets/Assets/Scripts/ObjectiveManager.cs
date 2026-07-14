@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class ObjectiveManager : MonoBehaviour
 {
     [Header("Scene Settings")]
-    [SerializeField] private string nextSceneName = "minigame_level2";
+    [SerializeField] private string nextSceneName = "kota";
 
     [Header("Fade Settings")]
     [SerializeField] private CanvasGroup fadeOverlay;
@@ -97,6 +97,10 @@ public class ObjectiveManager : MonoBehaviour
             overlay.alpha = 1f;
         }
 
-        SceneManager.LoadScene(nextSceneName);
+        var transition = FindAnyObjectByType<LevelToKotaTransition>();
+        if (transition != null)
+            transition.LoadKota();
+        else
+            SceneManager.LoadScene(nextSceneName);
     }
 }
