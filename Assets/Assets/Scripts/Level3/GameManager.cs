@@ -11,7 +11,6 @@ namespace Level3
     public GameObject winUI;
     public GameObject loseUI;
     public Text canCountText;
-    public Text notificationText;
 
     [Header("References")]
     public PlayerController player;
@@ -35,20 +34,20 @@ namespace Level3
     [Header("Gameplay State")]
     public bool hasLoot = false;
 
-    private float notifTimer = 0f;
     private bool isGameOver = false;
+    private bool isRestarting = false;
 
     void Awake()
     {
         if (!player) player = FindAnyObjectByType<PlayerController>();
         hasLoot = false;
         isGameOver = false;
+        isRestarting = false;
+        Time.timeScale = 1f;
     }
 
     void Start()
     {
-        if (notificationText != null)
-            notificationText.gameObject.SetActive(false);
         if (fadeOverlay != null)
         {
             Color c = fadeOverlay.color;
@@ -64,46 +63,18 @@ namespace Level3
         {
             canCountText.text = $"{player.GetThrowableCount()}";
         }
-
-        if (notifTimer > 0f)
-        {
-            notifTimer -= Time.deltaTime;
-            if (notifTimer <= 0f && notificationText != null)
-                notificationText.gameObject.SetActive(false);
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-            RestartLevel();
     }
 
     public void ShowNotification(string message, Color color, float duration = 3f)
     {
-        if (notificationText == null) return;
-        if (string.IsNullOrEmpty(message))
-        {
-            notificationText.gameObject.SetActive(false);
-            return;
-        }
-        notificationText.text = message;
-        notificationText.color = color;
-        notificationText.gameObject.SetActive(true);
-        notifTimer = duration;
-    }
-
-    public void HideNotification()
-    {
-        if (notificationText != null)
-            notificationText.gameObject.SetActive(false);
     }
 
     public void RegisterTrapTriggered(string areaName)
     {
         trapsTriggered++;
-        ShowNotification($"Area {areaName} berhasil dijebak! ({trapsTriggered}/{totalTraps})", Color.green, 3f);
 
         if (trapsTriggered >= totalTraps)
         {
-            ShowNotification("Semua area aman! Mencari kemenangan...", Color.yellow, 2f);
             Invoke(nameof(WinGame), 2f);
         }
     }
@@ -130,7 +101,6 @@ namespace Level3
 
         HideGameUI();
 
-        ShowNotification("Aksa tertangkap!", Color.red, 99f);
         if (loseUI) loseUI.SetActive(true);
         if (loseClip != null)
             AudioSource.PlayClipAtPoint(loseClip, Camera.main.transform.position, 1f);
@@ -142,7 +112,6 @@ namespace Level3
         if (objektifText) objektifText.SetActive(false);
         if (canIcon) canIcon.SetActive(false);
         if (kalengCounter) kalengCounter.SetActive(false);
-        if (notificationText) notificationText.gameObject.SetActive(false);
         if (canCountText) canCountText.gameObject.SetActive(false);
     }
 
@@ -167,8 +136,34 @@ namespace Level3
 
     public void RestartLevel()
     {
-        isGameOver = false;
+        if (isRestarting) return;
+        StartCoroutine(RestartWithFade());
+    }
+
+    IEnumerator RestartWithFade()
+    {
+        isRestarting = true;
         Time.timeScale = 1f;
+
+        if (fadeOverlay != null)
+        {
+            fadeOverlay.gameObject.SetActive(true);
+            Color c = fadeOverlay.color;
+            c.a = 0f;
+            fadeOverlay.color = c;
+
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                c.a = Mathf.Clamp01(elapsed / fadeDuration);
+                fadeOverlay.color = c;
+                yield return null;
+            }
+            c.a = 1f;
+            fadeOverlay.color = c;
+        }
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
