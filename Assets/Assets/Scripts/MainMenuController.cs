@@ -11,6 +11,8 @@ public class MainMenuController : MonoBehaviour
 
     void Start()
     {
+        EnsureSpawnManager();
+
         // Hook up button listeners dynamically
         if (startButton != null) startButton.onClick.AddListener(StartNewGame);
         if (continueButton != null) continueButton.onClick.AddListener(ContinueGame);
@@ -37,9 +39,10 @@ public class MainMenuController : MonoBehaviour
         // Clear progress on starting new game
         PlayerPrefs.DeleteKey("SavedLevel");
         PlayerPrefs.Save();
-        
-        // Load the first playable scene (Level 1 is BookFlipScene)
-        SceneManager.LoadScene("BookFlipScene");
+
+        SpawnPointManager.NextSpawnID = "SpawnPointDefault";
+        SpawnPointManager.NextAvailableLevel = "lvl1";
+        SceneManager.LoadScene("kota");
     }
 
     public void ContinueGame()
@@ -53,7 +56,9 @@ public class MainMenuController : MonoBehaviour
         else
         {
             // Fallback
-            SceneManager.LoadScene("BookFlipScene");
+            SpawnPointManager.NextSpawnID = "SpawnPointDefault";
+            SpawnPointManager.NextAvailableLevel = "lvl1";
+            SceneManager.LoadScene("kota");
         }
     }
 
@@ -61,5 +66,14 @@ public class MainMenuController : MonoBehaviour
     {
         Debug.Log("Exiting Game...");
         Application.Quit();
+    }
+
+    private void EnsureSpawnManager()
+    {
+        if (FindAnyObjectByType<SpawnPointManager>() == null)
+        {
+            var go = new GameObject("[SpawnPointManager]");
+            go.AddComponent<SpawnPointManager>();
+        }
     }
 }
