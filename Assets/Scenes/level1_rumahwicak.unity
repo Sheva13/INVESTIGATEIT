@@ -1405,6 +1405,13 @@ MonoBehaviour:
   speakerScale: 1.15
   listenerScale: 1.11
   listenerDimValue: 0.4
+  useCameraTransition: 0
+  mainCamera: {fileID: 0}
+  blackOverlay: {fileID: 0}
+  cameraFadeDuration: 0.5
+  hallwayCameraPosition: {x: 35.7, y: -28.5, z: -10}
+  kelasCameraPosition: {x: 18.41, y: 0.97, z: -10}
+  levelToKotaTransition: {fileID: 0}
 --- !u!212 &1991172507
 SpriteRenderer:
   serializedVersion: 2

@@ -139,7 +139,6 @@ namespace Level4
         public void CollectDocument()
         {
             if (isGameOver || isWin) return;
-            if (!Level4State.hasAllCans) return;
             isWin = true;
             Level4State.hasDocument = true;
             if (docPickupClip != null)
@@ -182,22 +181,7 @@ namespace Level4
         void UpdateObjectiveUI()
         {
             if (objectiveText == null) return;
-            switch (currentPhase)
-            {
-                case GamePhase.CollectCans:
-                    if (Level4State.hasAllCans)
-                        objectiveText.text = "Ambil dokumen";
-                    else
-                        objectiveText.text = $"Kumpulkan kaleng ({Level4State.canCount}/{Level4State.totalCans})";
-                    if (canCounterText != null)
-                        canCounterText.gameObject.SetActive(true);
-                    break;
-                case GamePhase.ReturnToStart:
-                    objectiveText.text = "Kembali ke tempat awal";
-                    if (canCounterText != null)
-                        canCounterText.gameObject.SetActive(false);
-                    break;
-            }
+            objectiveText.text = "Ambil dokumen";
         }
 
         IEnumerator AutoRestartAfterDelay()
