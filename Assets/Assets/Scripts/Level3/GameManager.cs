@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour
     public Image fadeOverlay;
     public float fadeDuration = 1.5f;
 
+    [Header("Restart")]
+    public float loseDelay = 3f;
+
     [Header("Trap System")]
     public int totalTraps = 5;
     public int trapsTriggered = 0;
@@ -103,6 +106,14 @@ public class GameManager : MonoBehaviour
         if (loseClip != null)
             AudioSource.PlayClipAtPoint(loseClip, Camera.main.transform.position, 1f);
         Time.timeScale = 0f;
+
+        StartCoroutine(AutoRestartAfterDelay());
+    }
+
+    IEnumerator AutoRestartAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(loseDelay);
+        RestartLevel();
     }
 
     void HideGameUI()
