@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class ObjectiveManager : MonoBehaviour
@@ -12,11 +13,8 @@ public class ObjectiveManager : MonoBehaviour
     [SerializeField] private CanvasGroup fadeOverlay;
     [SerializeField] private float fadeDuration = 3f;
 
-    [Header("Objectives")]
-    [SerializeField] private bool isFramePhotoTaken;
-    [SerializeField] private bool isBookPhotoTaken;
-    [SerializeField] private bool isLaptopPhotoTaken;
-    [SerializeField] private bool isPetaPhotoTaken;
+    private string[] requiredPhotos = { "frame", "book", "laptop" };
+    private HashSet<string> registeredPhotos = new HashSet<string>();
 
     private static ObjectiveManager _instance;
     public static ObjectiveManager Instance
@@ -44,22 +42,38 @@ public class ObjectiveManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void SetRequiredPhotos(string[] photos)
+    {
+        requiredPhotos = photos;
+        registeredPhotos.Clear();
+        Debug.Log($"ObjectiveManager: Required photos set to [{string.Join(", ", photos)}]");
+    }
+
+    public void ResetObjectives()
+    {
+        registeredPhotos.Clear();
+        Debug.Log("ObjectiveManager: Objectives reset.");
+    }
+
     public void RegisterPhoto(string id)
     {
-        switch (id)
+        registeredPhotos.Add(id);
+
+        int count = registeredPhotos.Count;
+        int total = requiredPhotos.Length;
+        Debug.Log($"Foto '{id}' tercatat! ({count}/{total})");
+
+        bool allDone = true;
+        foreach (string required in requiredPhotos)
         {
-            case "frame":  isFramePhotoTaken = true;  break;
-            case "book":   isBookPhotoTaken = true;   break;
-            case "laptop": isLaptopPhotoTaken = true;  break;
-            case "peta":   isPetaPhotoTaken = true;    break;
-            default:
-                Debug.LogWarning("Unknown photo id: " + id);
-                return;
+            if (!registeredPhotos.Contains(required))
+            {
+                allDone = false;
+                break;
+            }
         }
 
-        Debug.Log($"Foto {id} tercatat! Frame:{isFramePhotoTaken} Book:{isBookPhotoTaken} Laptop:{isLaptopPhotoTaken} Peta:{isPetaPhotoTaken}");
-
-        if (isFramePhotoTaken && isBookPhotoTaken && isLaptopPhotoTaken && isPetaPhotoTaken)
+        if (allDone)
         {
             Debug.Log("Semua foto terkumpul! Pindah scene...");
             StartCoroutine(FadeAndLoad());

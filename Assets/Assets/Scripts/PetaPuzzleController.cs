@@ -138,6 +138,9 @@ public class PetaPuzzleController : MonoBehaviour, IPointerClickHandler, IPointe
 
     private void Start()
     {
+        if (ObjectiveManager.Instance != null)
+            ObjectiveManager.Instance.SetRequiredPhotos(new string[] { "peta" });
+
         var outlineTransform = transform.Find("HoverOutline");
         if (outlineTransform != null)
         {
@@ -182,7 +185,7 @@ public class PetaPuzzleController : MonoBehaviour, IPointerClickHandler, IPointe
             ClosePuzzle();
         }
 
-        if (puzzleActive && !isPhotoMode && Input.GetKeyDown(KeyCode.Space))
+        if ((puzzleActive || puzzleSolved) && !isPhotoMode && Input.GetKeyDown(KeyCode.Space))
         {
             OnCameraClicked();
         }

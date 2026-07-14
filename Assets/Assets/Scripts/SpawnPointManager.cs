@@ -35,6 +35,9 @@ public class SpawnPointManager : MonoBehaviour
     {
         if (scene.name != "kota") return;
 
+        // Hapus semua Player object yang bukan milik scene kota
+        CleanupOldPlayers(scene);
+
         string spawnName = string.IsNullOrEmpty(NextSpawnID) ? "SpawnPointDefault" : NextSpawnID;
 
         // Cari spawn point (termasuk child objects)
@@ -45,7 +48,7 @@ public class SpawnPointManager : MonoBehaviour
         }
 
         // Cari player
-        GameObject player = GameObject.FindWithTag("Player");
+        GameObject player = FindKotaPlayer(scene);
         if (player == null)
         {
             Debug.LogWarning("Player dengan tag 'Player' tidak ditemukan di scene kota.");
@@ -72,6 +75,30 @@ public class SpawnPointManager : MonoBehaviour
                 Debug.Log($"Level '{lvl}' collider: {(lvl == NextAvailableLevel ? "ON" : "OFF")}");
             }
         }
+    }
+
+    private void CleanupOldPlayers(Scene kotaScene)
+    {
+        var allPlayers = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var p in allPlayers)
+        {
+            if (p.scene != kotaScene)
+            {
+                Debug.Log($"Destroying old Player from scene: {p.scene.name}");
+                Destroy(p);
+            }
+        }
+    }
+
+    private GameObject FindKotaPlayer(Scene kotaScene)
+    {
+        var allPlayers = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var p in allPlayers)
+        {
+            if (p.scene == kotaScene)
+                return p;
+        }
+        return null;
     }
 
     private Transform FindDeep(string name)

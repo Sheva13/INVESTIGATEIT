@@ -37,6 +37,26 @@ public class LevelEntryTrigger : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            playerInside = true;
+            if (promptCanvas != null)
+                promptCanvas.SetActive(true);
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            playerInside = false;
+            if (promptCanvas != null)
+                promptCanvas.SetActive(false);
+        }
+    }
+
     private void Update()
     {
         if (playerInside && Input.GetKeyDown(KeyCode.E))

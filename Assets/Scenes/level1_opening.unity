@@ -119,6 +119,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &245659441
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 245659443}
+  - component: {fileID: 245659442}
+  m_Layer: 0
+  m_Name: TransitionToKota
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &245659442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245659441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7a1b003c0a96ce4c9d5b3119e0e0dd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelToKotaTransition
+  spawnID: SpawnPointDefault
+  nextAvailableLevel: lvl1
+--- !u!4 &245659443
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245659441}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &247535023
 GameObject:
   m_ObjectHideFlags: 0
@@ -1057,7 +1103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc98bb6960d521d4084dda2b63f33307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OpeningDialogManager
-  phoneAudioSource: {fileID: 1568038494}
+  phoneAudioSource: {fileID: 0}
   phoneVibrateClip: {fileID: 8300000, guid: 6ac66a23551a3f644a3c28681557ee6f, type: 3}
   dialogRootGroup: {fileID: 743999921}
   wicakImage: {fileID: 1425319287}
@@ -1113,10 +1159,19 @@ MonoBehaviour:
     wicakExpression: {fileID: 21300000, guid: 387024ccda8de3542948c73d67d4681f, type: 3}
     aksaExpression: {fileID: 21300000, guid: 9b1be3d3cc019e040a6e0031bb74abe9, type: 3}
     text: 'Aksa: "...."'
+  onDialogFinished:
+    m_PersistentCalls:
+      m_Calls: []
   overlayFadeDuration: 0.5
   speakerScale: 1.15
   listenerScale: 1.9
   listenerDimValue: 0.4
+  mainCamera: {fileID: 0}
+  blackOverlay: {fileID: 0}
+  cameraFadeDuration: 0.5
+  hallwayCameraPosition: {x: 0, y: 1, z: -10}
+  kelasCameraPosition: {x: 18.41, y: 0.97, z: -10}
+  levelToKotaTransition: {fileID: 245659442}
 --- !u!82 &1568038494
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1554,3 +1609,4 @@ SceneRoots:
   - {fileID: 1568038497}
   - {fileID: 2110873491}
   - {fileID: 783769820}
+  - {fileID: 245659443}

@@ -34,6 +34,11 @@ public class PlayerController2 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+
+        // Nonaktifkan Animator agar tidak override sprite dengan Level 2 clips
+        if (animator != null)
+            animator.enabled = false;
+
         if (!audioSource) audioSource = GetComponent<AudioSource>();
         if (audioSource != null)
         {

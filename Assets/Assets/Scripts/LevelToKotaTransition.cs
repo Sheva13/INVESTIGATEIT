@@ -9,6 +9,9 @@ public class LevelToKotaTransition : MonoBehaviour
 
     public void LoadKota()
     {
+        if (ObjectiveManager.Instance != null)
+            ObjectiveManager.Instance.ResetObjectives();
+
         SpawnPointManager.NextSpawnID = spawnID;
         SpawnPointManager.NextAvailableLevel = nextAvailableLevel;
         SceneManager.LoadScene("kota");
