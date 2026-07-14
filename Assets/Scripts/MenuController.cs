@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.EventSystems;
 
@@ -103,6 +104,11 @@ public class MenuController : MonoBehaviour
     {
         var text = menuItems[index].text.ToUpper();
         Debug.Log("Selected: " + text);
+
+        if (text == "PLAY")
+        {
+            SceneManager.LoadScene("level1_opening");
+        }
     }
 
     private void UpdateVisuals()
