@@ -802,8 +802,8 @@ MonoBehaviour:
   dialogueText: {fileID: 1683253467}
   panelDialogRenderer: {fileID: 918237009}
   fadeOverlay: {fileID: 847274305}
-  fadeInDuration: 1.9
-  fadeOutDuration: 1.5
+  fadeInDuration: 0.5
+  fadeOutDuration: 0.5
   bgmSource: {fileID: 918237007}
   bgmFadeInDuration: 2
   bgmFadeOutDuration: 2

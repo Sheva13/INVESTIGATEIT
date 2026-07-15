@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using Level3;
 
 public enum GuardState
@@ -36,6 +37,7 @@ public class GuardAI : MonoBehaviour
 
     [Header("Capture")]
     public float captureDistance = 0.8f;
+    public UnityEvent onPlayerCaptured;
 
     [Header("Footstep Audio")]
     public AudioClip[] footstepClips;
@@ -232,6 +234,7 @@ public class GuardAI : MonoBehaviour
         if (dist <= captureDistance)
         {
             if (gmCache != null) gmCache.LoseGame();
+            onPlayerCaptured?.Invoke();
             return;
         }
 
