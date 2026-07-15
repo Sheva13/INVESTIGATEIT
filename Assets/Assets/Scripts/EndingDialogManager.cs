@@ -23,7 +23,7 @@ public class EndingDialogManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogueText;
 
     [Header("Panel Background")]
-    [SerializeField] private SpriteRenderer panelDialogRenderer;
+    [SerializeField] private Image panelDialogBG;
 
     [Header("Fade Screen")]
     [SerializeField] private Graphic fadeOverlay;
@@ -38,6 +38,11 @@ public class EndingDialogManager : MonoBehaviour
 
     [Header("Dialog Data")]
     [SerializeField] private List<EndingDialogEntry> dialogEntries = new List<EndingDialogEntry>();
+
+    [Header("Post Dialog Image")]
+    [SerializeField] private Image postDialogImage;
+    [SerializeField] private float postDialogFadeInDuration = 0.5f;
+    [SerializeField] private float postDialogFadeOutDuration = 0.5f;
 
     [Header("Events")]
     public UnityEvent onDialogFinished;
@@ -54,6 +59,7 @@ public class EndingDialogManager : MonoBehaviour
     private int currentEntryIndex = 0;
     private bool isDialogActive = false;
     private bool hasStarted = false;
+    private bool waitingForPostDialogClick = false;
 
     private void Start()
     {
@@ -64,11 +70,11 @@ public class EndingDialogManager : MonoBehaviour
             dialogRootGroup.blocksRaycasts = false;
         }
 
-        if (panelDialogRenderer != null)
+        if (panelDialogBG != null)
         {
-            Color c = panelDialogRenderer.color;
+            Color c = panelDialogBG.color;
             c.a = 1f;
-            panelDialogRenderer.color = c;
+            panelDialogBG.color = c;
         }
 
         if (fadeOverlay != null)
@@ -77,6 +83,14 @@ public class EndingDialogManager : MonoBehaviour
             c.a = 1f;
             fadeOverlay.color = c;
             fadeOverlay.raycastTarget = true;
+        }
+
+        if (postDialogImage != null)
+        {
+            var c = postDialogImage.color;
+            c.a = 0f;
+            postDialogImage.color = c;
+            postDialogImage.gameObject.SetActive(false);
         }
 
         if (bgmSource != null && bgmSource.clip != null)
@@ -131,6 +145,11 @@ public class EndingDialogManager : MonoBehaviour
         {
             ShowNextEntry();
         }
+        else if (waitingForPostDialogClick && Input.GetMouseButtonDown(0))
+        {
+            waitingForPostDialogClick = false;
+            StartCoroutine(PostDialogFadeOutAndEnd());
+        }
     }
 
     private IEnumerator StartDialog()
@@ -184,6 +203,52 @@ public class EndingDialogManager : MonoBehaviour
                 yield return null;
             }
             dialogRootGroup.alpha = 0f;
+        }
+
+        if (postDialogImage != null)
+        {
+            postDialogImage.gameObject.SetActive(true);
+            float elapsed = 0f;
+            while (elapsed < postDialogFadeInDuration)
+            {
+                elapsed += Time.deltaTime;
+                var c = postDialogImage.color;
+                c.a = Mathf.Clamp01(elapsed / postDialogFadeInDuration);
+                postDialogImage.color = c;
+                yield return null;
+            }
+            var c2 = postDialogImage.color;
+            c2.a = 1f;
+            postDialogImage.color = c2;
+
+            waitingForPostDialogClick = true;
+            yield return new WaitUntil(() => !waitingForPostDialogClick);
+        }
+        else
+        {
+            yield return StartCoroutine(BlackFadeOut());
+            onDialogFinished?.Invoke();
+            yield break;
+        }
+    }
+
+    private IEnumerator PostDialogFadeOutAndEnd()
+    {
+        if (postDialogImage != null)
+        {
+            float elapsed = 0f;
+            while (elapsed < postDialogFadeOutDuration)
+            {
+                elapsed += Time.deltaTime;
+                var c = postDialogImage.color;
+                c.a = 1f - Mathf.Clamp01(elapsed / postDialogFadeOutDuration);
+                postDialogImage.color = c;
+                yield return null;
+            }
+            var c2 = postDialogImage.color;
+            c2.a = 0f;
+            postDialogImage.color = c2;
+            postDialogImage.gameObject.SetActive(false);
         }
 
         yield return StartCoroutine(BlackFadeOut());

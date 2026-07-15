@@ -812,56 +812,39 @@ MonoBehaviour:
   - speaker: Aksa
     ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
     aksaExpression: {fileID: 21300000, guid: b32bb6ee2815405409223663e940f170, type: 3}
-    text: Ketos. Aku tahu semuanya. Bisnismu... narkoba.
+    text: 'Aksa: "Loh?! Jadi bener kamu di belakang ini semua?!"'
   - speaker: Ketos
-    ketosExpression: {fileID: 21300000, guid: 91b678165bca6b244b064e73d8197f91, type: 3}
+    ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
     aksaExpression: {fileID: 21300000, guid: 9fcce6129023eae4b8a9a2fedafddb65, type: 3}
-    text: Heh. Kamu pikir kamu bisa bicara seperti itu padaku? Aku Ketua OSIS.
+    text: 'Ketos: "Ngapain teriak, berisik banget..." '
   - speaker: Aksa
     ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
     aksaExpression: {fileID: 21300000, guid: f20b936ab22b53d4783fb74c3e22cb38, type: 3}
-    text: Jangan sembunyi di balik jabatan. Aku tahu kamu yang menjalankan semuanya.
+    text: 'Aksa: "Kamu yang ngejual ke Wicak?!?!"'
   - speaker: Ketos
     ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
     aksaExpression: {fileID: 21300000, guid: 9fcce6129023eae4b8a9a2fedafddb65, type: 3}
-    text: Bisnis ini besar, Aksa. Bukan urusan anak sepertimu. Kamu tidak mengerti
-      kekuasaan.
+    text: 'Ketos: "Wicak? Kacungnya Aldi? ya namanya juga bisnis, aku jual ke semua
+      yang beli. Lagipula kamu ngerti apa sih soal bisnis"'
   - speaker: Aksa
     ketosExpression: {fileID: 21300000, guid: 91b678165bca6b244b064e73d8197f91, type: 3}
     aksaExpression: {fileID: 21300000, guid: 9fcce6129023eae4b8a9a2fedafddb65, type: 3}
-    text: Kekuasaan? Kamu bicara soal kekuasaan setelah semua yang terjadi?
+    text: 'Aksa: "Yang kamu bilang bisnis itu cuma bakal ngebunuh banyak orang lagi,
+      dasar EGOIS"'
   - speaker: Ketos
     ketosExpression: {fileID: 21300000, guid: 91b678165bca6b244b064e73d8197f91, type: 3}
     aksaExpression: {fileID: 21300000, guid: 9fcce6129023eae4b8a9a2fedafddb65, type: 3}
-    text: Semua orang tahu risikonya. Mereka yang memilih sendiri jalannya. Termasuk
-      Wicak.
+    text: 'Ketos: "Lebih egois mana? Aku yang cuma jualan atau mereka yang make dengan
+      alasan sepele. Kayak si Wicak itu, dia yang milih nyimeng dia juga yang mati,
+      bukan salah ku dong"'
   - speaker: Aksa
     ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
     aksaExpression: {fileID: 21300000, guid: b32bb6ee2815405409223663e940f170, type: 3}
-    text: Jangan sebut namanya! Kamu yang mendekatinya! Kamu yang bujuk dia!
+    text: 'Aksa: "GET HIS NAME OUT OF YOUR MOUTH, BEIRISIK AKU BAKAL ALPORIN KALIAN"'
   - speaker: Ketos
     ketosExpression: {fileID: 21300000, guid: 9c2934f0e4d29fb49b2761438c8db028, type: 3}
     aksaExpression: {fileID: 21300000, guid: f20b936ab22b53d4783fb74c3e22cb38, type: 3}
-    text: Wicak itu lemah. Dia gagal mengendalikan dirinya. Bukan salahku kalau dia
-      tidak tahan.
-  - speaker: Aksa
-    ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
-    aksaExpression: {fileID: 21300000, guid: 4d7454af37291644697af479b6a06d7d, type: 3}
-    text: Dia sahabatku, Ketos... Sahabatku. Dan kamu... kamu yang bunuh dia pelan-pelan.
-  - speaker: Ketos
-    ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
-    aksaExpression: {fileID: 21300000, guid: 9fcce6129023eae4b8a9a2fedafddb65, type: 3}
-    text: Bunuh? Lebih bagus bilang... melepaskan. Aku hanya memberi pilihan.
-  - speaker: Aksa
-    ketosExpression: {fileID: 21300000, guid: 9c2934f0e4d29fb49b2761438c8db028, type: 3}
-    aksaExpression: {fileID: 21300000, guid: b32bb6ee2815405409223663e940f170, type: 3}
-    text: Pilihan?! Dia meninggal karena pilihanmu! Dan aku... aku tidak akan biarkan
-      ini terus berlanjut.
-  - speaker: Aksa
-    ketosExpression: {fileID: 21300000, guid: 6af6ea38ea97cf64e954b5b8bb795a5e, type: 3}
-    aksaExpression: {fileID: 21300000, guid: f20b936ab22b53d4783fb74c3e22cb38, type: 3}
-    text: Semua bukti sudah kupegang. Kali ini aku yang akan menentukan akhirnya.
-      Siap-siap hadapi polisi, Ketos.
+    text: 'Ketos: "Kayak bisa aja, kamu emang siapa? HAHAHAHA"'
   onDialogFinished:
     m_PersistentCalls:
       m_Calls: []
