@@ -1171,7 +1171,6 @@ MonoBehaviour:
   cameraFadeDuration: 0.5
   hallwayCameraPosition: {x: 0, y: 1, z: -10}
   kelasCameraPosition: {x: 18.41, y: 0.97, z: -10}
-  levelToKotaTransition: {fileID: 245659442}
 --- !u!82 &1568038494
 AudioSource:
   m_ObjectHideFlags: 0
