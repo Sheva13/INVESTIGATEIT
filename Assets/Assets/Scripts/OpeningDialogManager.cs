@@ -208,7 +208,7 @@ public class OpeningDialogManager : MonoBehaviour
         if (levelToKotaTransition != null)
             levelToKotaTransition.LoadKota();
         else
-            SceneManager.LoadScene("kota");
+            SceneManager.LoadScene("SampleScene");
     }
 
     private void ShowEntry(int index)

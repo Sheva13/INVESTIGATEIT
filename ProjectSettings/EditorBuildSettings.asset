@@ -5,9 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainMenu.unity
     guid: a064f8289d880c14496f5b5b7dde95b8
+  - enabled: 1
+    path: Assets/Scenes/MenuScene.unity
+    guid: 96d0e6dbaabbdcb4c9b0b2389471d824
   - enabled: 1
     path: Assets/Scenes/BookFlipScene.unity
     guid: 9c42c4aa886ec0d448ad52797b90928a
