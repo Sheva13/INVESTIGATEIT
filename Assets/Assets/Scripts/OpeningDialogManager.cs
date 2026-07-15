@@ -41,11 +41,15 @@ public class OpeningDialogManager : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float listenerDimValue = 0.4f;
 
     [Header("Camera Transition")]
+    [SerializeField] private bool useCameraTransition = true;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Graphic blackOverlay;
     [SerializeField] private float cameraFadeDuration = 0.5f;
-    [SerializeField] private Vector3 hallwayCameraPosition = new Vector3(0, 1, -10);
+    [SerializeField] private Vector3 hallwayCameraPosition = new Vector3(35.7f, -28.5f, -10f);
     [SerializeField] private Vector3 kelasCameraPosition = new Vector3(18.41f, 0.97f, -10);
+
+    [Header("Scene Transition")]
+    [SerializeField] private LevelToKotaTransition levelToKotaTransition;
 
     private int currentEntryIndex = 0;
     private bool isDialogActive = false;
@@ -56,19 +60,22 @@ public class OpeningDialogManager : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        if (mainCamera != null)
+        if (mainCamera != null && useCameraTransition)
             mainCamera.transform.position = hallwayCameraPosition;
 
         if (blackOverlay != null)
         {
-            var fc = blackOverlay.transform.parent;
-            if (fc != null)
-                DontDestroyOnLoad(fc.gameObject);
+            if (useCameraTransition)
+            {
+                var fc = blackOverlay.transform.parent;
+                if (fc != null)
+                    DontDestroyOnLoad(fc.gameObject);
+            }
 
             var c = blackOverlay.color;
             c.a = 0f;
             blackOverlay.color = c;
-            blackOverlay.raycastTarget = true;
+            blackOverlay.raycastTarget = useCameraTransition;
         }
 
         if (dialogRootGroup != null)
@@ -101,44 +108,47 @@ public class OpeningDialogManager : MonoBehaviour
         if (phoneAudioSource != null)
             phoneAudioSource.Stop();
 
-        if (blackOverlay != null)
+        if (useCameraTransition)
         {
-            float elapsed = 0f;
-            while (elapsed < cameraFadeDuration)
+            if (blackOverlay != null)
             {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Lerp(0f, 1f, elapsed / cameraFadeDuration);
-                var c = blackOverlay.color;
-                c.a = t;
-                blackOverlay.color = c;
-                yield return null;
+                float elapsed = 0f;
+                while (elapsed < cameraFadeDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Lerp(0f, 1f, elapsed / cameraFadeDuration);
+                    var c = blackOverlay.color;
+                    c.a = t;
+                    blackOverlay.color = c;
+                    yield return null;
+                }
+                var c2 = blackOverlay.color;
+                c2.a = 1f;
+                blackOverlay.color = c2;
             }
-            var c2 = blackOverlay.color;
-            c2.a = 1f;
-            blackOverlay.color = c2;
-        }
 
-        if (mainCamera != null)
-            mainCamera.transform.position = kelasCameraPosition;
+            if (mainCamera != null)
+                mainCamera.transform.position = kelasCameraPosition;
 
-        yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.1f);
 
-        if (blackOverlay != null)
-        {
-            float elapsed = 0f;
-            while (elapsed < cameraFadeDuration)
+            if (blackOverlay != null)
             {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Lerp(1f, 0f, elapsed / cameraFadeDuration);
-                var c = blackOverlay.color;
-                c.a = t;
-                blackOverlay.color = c;
-                yield return null;
+                float elapsed = 0f;
+                while (elapsed < cameraFadeDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Lerp(1f, 0f, elapsed / cameraFadeDuration);
+                    var c = blackOverlay.color;
+                    c.a = t;
+                    blackOverlay.color = c;
+                    yield return null;
+                }
+                var c2 = blackOverlay.color;
+                c2.a = 0f;
+                blackOverlay.color = c2;
+                blackOverlay.raycastTarget = false;
             }
-            var c2 = blackOverlay.color;
-            c2.a = 0f;
-            blackOverlay.color = c2;
-            blackOverlay.raycastTarget = false;
         }
 
         isDialogActive = true;
@@ -195,7 +205,10 @@ public class OpeningDialogManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        SceneManager.LoadScene("level2_platformer");
+        if (levelToKotaTransition != null)
+            levelToKotaTransition.LoadKota();
+        else
+            SceneManager.LoadScene("kota");
     }
 
     private void ShowEntry(int index)
