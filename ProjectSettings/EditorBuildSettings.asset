@@ -38,5 +38,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/level1_rumahwicak.unity
     guid: 461ab6f472e88d14881e36c16f620bbf
+  - enabled: 1
+    path: Assets/Scenes/level4_dialog.unity
+    guid: 09bd5e6636b1caf43859aa1e3b6c2eb5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
